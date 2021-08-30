@@ -86,3 +86,97 @@ exports.updateProfile=(req,res,next)=>{
 
 
 };
+
+
+exports.resetPassword = (req, res) => {
+  if (!req.body.mobile) {
+      res.status(400).send({
+        message: "Mobile Number required"
+      });
+    }
+
+    var condition =  { mobile:req.body.mobile };
+    var user = User.findOne({ where: condition }).then(userData=>{
+
+    if(!userData){
+
+      res.status(500).json({
+          message: "Mobile Number not Registered with Us",
+          success:0
+        });
+    }else{
+
+  
+  
+              const updateUser = {
+
+                  otp:Math.floor(Math.random() * (999999 - 100000) + 100000)
+                };
+                User.update(updateUser,{where:{id:userData.id}})
+                .then(async data => {
+
+                  res.status(200).send({
+                      message: "OTP Sent to Your Mobile Number",
+                     // data: data,
+                      success:1
+                    });
+                });
+         
+
+  
+
+
+    }
+
+
+    });
+
+
+};
+
+
+exports.changePassword = (req, res) => {
+  if (!req.body.mobile) {
+      res.status(400).send({
+        message: "Mobile Number required"
+      });
+    }
+
+    var condition =  { mobile:req.body.mobile };
+    var user = User.findOne({ where: condition }).then(async userProfile=>{
+
+    if(userProfile.otp!=req.body.otp){
+
+      res.status(500).json({
+          message: "Incorrect OTP",
+          success:0
+        });
+    }else{
+
+             var encPassword= await bcrypt.hash(req.body.password,10);
+  
+              const updateUser = {
+
+                  password:encPassword
+                };
+                User.update(updateUser,{where:{id:userProfile.id}})
+                .then(async data => {
+
+                  res.status(200).send({
+                      message: "Password Changed Successfully",
+                     // data: data,
+                      success:1
+                    });
+                });
+         
+
+  
+
+
+    }
+
+
+    });
+
+
+};

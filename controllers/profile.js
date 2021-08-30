@@ -4,7 +4,6 @@ const Op = db.Sequelize.Op;
 const jwt = require('jsonwebtoken');
 const bcrypt= require('bcrypt');
 require('dotenv').config();
-var formidable = require('formidable');
 var fs = require('fs');
 exports.profile=(req,res,next)=>{
 
@@ -26,24 +25,11 @@ exports.profile=(req,res,next)=>{
 
 
 
-exports.updateProfile=(req,res,next)=>{
+exports.updateProfile= (req,res,next)=>{
 
-  var user = User.findByPk(req.userData.userId).then(user=>{
+  var user = User.findByPk(req.userData.userId).then(async user=>{
 
-  //       var form = new formidable.IncomingForm();
-  //   form.parse(req, function (err, fields, files) {
-
-  //       var oldpath = files.filetoupload.path;
-  //      console.log(oldpath);
-  //       var newpath = 'F:/change path to your project dir/' + files.filetoupload.name;
-  //       mv(oldpath, newpath, function (err) {
-  //         if (err) throw err;
-  //         res.write('File uploaded and moved!');
-  //         res.end();
-  //       });
-
-  // });
-    User.update({name:req.body.name,profilePic:'public/images/' + files.filetoupload.name},{where:{id:user.id}});
+    User.update({name:req.body.name,profilePic:req.body.profilePic},{where:{id:user.id}});
     res.status(200).json({
 
       message:'Profile Updated Successfully',
@@ -78,6 +64,42 @@ exports.updateBank=(req,res,next)=>{
       success:1
     });
   })
+
+
+};
+
+
+exports.changePassword = (req, res) => {
+
+
+    var condition =  { id:req.userData.userId };
+    var user = User.findOne({ where: condition }).then(async userProfile=>{
+
+
+             var encPassword= await bcrypt.hash(req.body.password,10);
+  
+              const updateUser = {
+
+                  password:encPassword
+                };
+                User.update(updateUser,{where:{id:userProfile.id}})
+                .then(async data => {
+
+                  res.status(200).send({
+                      message: "Password Changed Successfully",
+                     // data: data,
+                      success:1
+                    });
+                });
+         
+
+  
+
+
+    
+
+
+    });
 
 
 };
