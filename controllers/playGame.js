@@ -37,12 +37,93 @@ exports.fetchGame= (req,res) => {
         order: [ [ 'createdAt', 'DESC' ]],
     }).then(async latestGame=>{
     var recentColors= await gamePlays.findAll({attributes:['result'],limit:15,order:[['id','DESC']],where:{result:{[Op.not]:null}}});
-      console.log(latestGame);
+    var allColors= await Color.findAll();
+    var colorTotal={};
+    var gamePlayId= latestGame.id;
+    console.log(gamePlayId);
+    for(let oneColor of allColors){
+   
+      var colorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id}});
+      var oneColorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:1}});
+      // var sumOneColorPosition=0;
+      // var sumTwoColorPosition=0;
+      // var sumTenColorPosition=0;
+      // var sumHundredPosition=0;
+      // var sumFiveHundredColorPosition=0;
+      // var sumOneKColorPosition=0;
+      // var sumFiveKColorPosition=0;
+      // for(oneColorPosition of oneColorPositions){
+   
+      //  sumOneColorPosition += oneColorPosition.amount*oneColorPosition.ntimes;
+      // }
+   
+      var twoColorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:2}});
+      // for(twoColorPosition of twoColorPositions){
+   
+      //  sumTwoColorPosition += twoColorPosition.amount*twoColorPosition.ntimes;
+      // }
+   
+      var tenColorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:10}});
+      // for(tenColorPosition of tenColorPositions){
+   
+      //  sumTenColorPosition += tenColorPosition.amount*tenColorPosition.ntimes;
+      // }
+   
+      var hundredPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:100}});
+      // for(hundredPosition of hundredPositions){
+   
+      //  sumHundredPosition += hundredPosition.amount*hundredPosition.ntimes;
+      // }
+       var fiveHundredColorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:500}});
+      // for(fiveHundredColorPosition of fiveHundredColorPositions){
+   
+      //  sumFiveHundredColorPosition += fiveHundredColorPosition.amount*fiveHundredColorPosition.ntimes;
+      // }
+      var oneKColorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:1000}});
+      // for(oneKColorPosition of oneKColorPositions){
+   
+      //  sumOneKColorPosition += oneKColorPosition.amount*oneKColorPosition.ntimes;
+      // }
+      var fiveKColorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:5000}});
+      // for(fiveKColorPosition of fiveKColorPositions){
+   
+      //  sumFiveKColorPosition += fiveKColorPosition.amount*fiveKColorPosition.ntimes;
+      // }
+   
+      
+      var colorAmount=0;
+      console.log(colorPositions);
+      for(let colorPosition of colorPositions){
+   
+         colorAmount +=  parseInt(colorPosition.amount);
+      }
+   
+       colorTotal[oneColor.slug] = {
+         '1':oneColorPositions.length,
+         '2':twoColorPositions.length,
+         '10':tenColorPositions.length,
+         '100':hundredPositions.length,
+         '500':fiveHundredColorPositions.length,
+         '1k':oneKColorPositions.length,
+         '5k':fiveKColorPositions.length,
+         total:colorAmount
+       };
+   
+    }
+    var colors =[];
+    var i=0;
+    for(let recentColor of recentColors){
+     var colorName= await Color.findByPk(recentColor.result);
+     colors[i] = colorName.slug;
+     i++;
+    }
+      
 
         res.status(200).json({
             success:1,
             game:latestGame,
-            colors:recentColors
+            colors:colors,
+            colorTotal:colorTotal
         });
 
     });
@@ -78,7 +159,7 @@ exports.play = async (req, res, next) => {
         var debitEarnings= useEarning;
         await User.update({wallet:debitWallet,earnings:debitEarnings},{where:{id:player.id}});
         await walletHistory.create({
-          user_id:player.id,game_id:1,amount:-amount,balance:debitWallet,credit_debit:'debit',type:'game'
+          user_id:player.id,game_id:1,amount:-amount,balance:debitWallet,credit_debit:'debit',type:'game',wallet_type:'earnings'
         });
 
       }else{
@@ -87,18 +168,19 @@ exports.play = async (req, res, next) => {
 
         await User.update({wallet:debitWallet},{where:{id:player.id}});
         await walletHistory.create({
-          user_id:player.id,game_id:1,amount:-amount,balance:debitWallet,credit_debit:'debit',type:'game'
+          user_id:player.id,game_id:1,amount:-amount,balance:debitWallet,credit_debit:'debit',type:'game',wallet_type:'wallet'
         });
 
       }
 
-
+      var color = await Color.findByPk(req.body.option);
+console.log(color);
       const newPlay = {
         user_id:userId,
         game_id:1,
         game_play_id:req.body.game_play_id,
         option:req.body.option,
-        ntimes:req.body.ntimes,
+        ntimes:color.ntimes,
         amount:req.body.amount
       };
       gamePosition.create(newPlay)

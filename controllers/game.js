@@ -5,6 +5,7 @@ const Color = db.color;
 const walletHistory=db.walletHistory;
 const User = db.user;
 const Op = db.Sequelize.Op;
+const Setting = db.setting;
 exports.games= (req,res) => {
 
 
@@ -72,15 +73,21 @@ exports.games= (req,res) => {
 
                     for(let gameWinner of allGameWinners){
                       var winner =await User.findByPk(gameWinner.user_id);
+                      var setting = await Setting.findOne({where:{slug:'gulkan_points_percent'}});
                       var winAmount= gameWinner.amount;
                       console.log(winAmount);
                       var nTimes =  gameWinner.ntimes;
                       var totalWinAmount = (winAmount*nTimes);
                       var newEarnings= winner.earnings+totalWinAmount;
+                      var gulkanPoints= (setting.option/100)*totalWinAmount;
+                      var newGulkanPoints = parseInt(winner.gulkan_points)+parseInt(gulkanPoints);
 
-                      await User.update({earnings:newEarnings},{where:{id:gameWinner.user_id}});
+                      await User.update({earnings:newEarnings,gulkan_points:newGulkanPoints},{where:{id:gameWinner.user_id}});
                       await walletHistory.create({
                         user_id:winner.id,game_id:fetchPlay.id,amount:totalWinAmount,balance:newEarnings,credit_debit:'credit',type:'game'
+                      });
+                      await walletHistory.create({
+                        user_id:winner.id,game_id:1,amount:gulkanPoints,balance:newGulkanPoints,credit_debit:'credit',type:'bonus',wallet_type:'gulkan_points'
                       });
                      //oneGameColorAmount.push(optionAmount*nTimes)
                     }
@@ -150,12 +157,94 @@ exports.result= async(req,res)=>{
 
   var result ='';
  }
+ var recentColors= await gamePlay.findAll({attributes:['result'],limit:15,order:[['id','DESC']],where:{result:{[Op.not]:null}}});
+ var allColors= await Color.findAll();
+ var colorTotal={};
+ for(let oneColor of allColors){
+
+   var colorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id}});
+   var oneColorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:1}});
+   var sumOneColorPosition=0;
+   var sumTwoColorPosition=0;
+   var sumTenColorPosition=0;
+   var sumHundredPosition=0;
+   var sumFiveHundredColorPosition=0;
+   var sumOneKColorPosition=0;
+   var sumFiveKColorPosition=0;
+   for(oneColorPosition of oneColorPositions){
+
+    sumOneColorPosition += oneColorPosition.amount*oneColorPosition.ntimes;
+   }
+
+   var twoColorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:2}});
+   for(twoColorPosition of twoColorPositions){
+
+    sumTwoColorPosition += twoColorPosition.amount*twoColorPosition.ntimes;
+   }
+
+   var tenColorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:10}});
+   for(tenColorPosition of tenColorPositions){
+
+    sumTenColorPosition += tenColorPosition.amount*tenColorPosition.ntimes;
+   }
+
+   var hundredPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:100}});
+   for(hundredPosition of hundredPositions){
+
+    sumHundredPosition += hundredPosition.amount*hundredPosition.ntimes;
+   }
+   var fiveHundredColorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:500}});
+   for(fiveHundredColorPosition of fiveHundredColorPositions){
+
+    sumFiveHundredColorPosition += fiveHundredColorPosition.amount*fiveHundredColorPosition.ntimes;
+   }
+   var oneKColorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:1000}});
+   for(oneKColorPosition of oneKColorPositions){
+
+    sumOneKColorPosition += oneKColorPosition.amount*oneKColorPosition.ntimes;
+   }
+   var fiveKColorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:5000}});
+   for(fiveKColorPosition of fiveKColorPositions){
+
+    sumFiveKColorPosition += fiveKColorPosition.amount*fiveKColorPosition.ntimes;
+   }
+
+   
+   var colorAmount=0;
+   console.log(colorPositions);
+   for(let colorPosition of colorPositions){
+
+      colorAmount +=  parseInt(colorPosition.amount)*parseInt(colorPosition.ntimes);
+   }
+
+    colorTotal[oneColor.slug] = {
+      '1':sumOneColorPosition,
+      '2':sumTwoColorPosition,
+      '10':sumTenColorPosition,
+      '100':sumHundredPosition,
+      '500':sumFiveHundredColorPosition,
+      '1k':sumOneKColorPosition,
+      '5k':sumFiveKColorPosition,
+      total:colorAmount
+    };
+
+ }
+ var colors =[];
+ var i=0;
+ for(let recentColor of recentColors){
+  var colorName= await Color.findByPk(recentColor.result);
+  colors[i] = colorName.slug;
+  i++;
+ }
+   
 
   res.status(200).json({
 
    
     result:parseInt(result),
     game:gamePlayings,
+    colors:colors,
+    colorTotal:colorTotal
 });
 
 

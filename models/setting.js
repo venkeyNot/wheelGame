@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     status: DataTypes.ENUM('show','hide')
   }, {
     sequelize,
-    modelName: 'Setting',
+    modelName: 'setting',
   });
   return Setting;
 };

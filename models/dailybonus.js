@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class color extends Model {
+  class dailyBonus extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -13,17 +13,14 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   };
-  color.init({
-    name: DataTypes.TEXT,
-    degrees: DataTypes.TEXT,
-    slug: DataTypes.TEXT,
-    count: DataTypes.BIGINT,
-    ntimes: DataTypes.BIGINT,
-    comment: DataTypes.TEXT,
-    status: DataTypes.ENUM('show','hide')
+  dailyBonus.init({
+    name: DataTypes.STRING,
+    description: DataTypes.TEXT,
+    days: DataTypes.INTEGER,
+    bonus: DataTypes.INTEGER
   }, {
     sequelize,
-    modelName: 'color',
+    modelName: 'dailyBonus',
   });
-  return color;
+  return dailyBonus;
 };

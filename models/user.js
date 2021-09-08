@@ -23,6 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     mobile_verified: DataTypes.ENUM('yes','no'),
     wallet: DataTypes.DOUBLE,
     earnings: DataTypes.DOUBLE,
+    gulkan_points: DataTypes.DOUBLE,
     profilePic: DataTypes.STRING,
     bankAccountNumber: DataTypes.STRING,
     bankAccountName: DataTypes.STRING,
@@ -30,6 +31,8 @@ module.exports = (sequelize, DataTypes) => {
     bankName: DataTypes.STRING,
     bankAddress: DataTypes.STRING,
     UPI: DataTypes.STRING,
+    your_id: DataTypes.STRING,
+    referral_id: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'user',

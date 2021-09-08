@@ -28,8 +28,9 @@ router.post('/profile/update',userAuth, profileController.updateProfile);
 router.post('/profile/changePassword',userAuth, profileController.changePassword);
 
 
-router.get('/wallet/history',userAuth, walletController.history);
+router.post('/wallet/history',userAuth, walletController.history);
 router.post('/wallet/recharge',userAuth, walletController.recharge);
+router.get('/wallet/gulkanToWallet',userAuth, walletController.transferGulkan);
 
 router.get('/fetchGame', playGameController.fetchGame);
 router.get('/colors', playGameController.colors);
@@ -40,8 +41,8 @@ router.get('/game', gameController.games);
 router.post('/result', gameController.result);
 
 router.post('/test', testController.test);
-router.get('/redis', redisController.connect);
-
+router.get('/create', redisController.create);
+router.get('/connect', redisController.connect);
 router.get('/withdraws',userAuth, withdrawController.withdrawRequests);
 router.post('/withdraw/request',userAuth, withdrawController.request);
 
@@ -55,5 +56,5 @@ router.post('/upload/profile_pic', upload.single('profile_pic'), function (req, 
         image:file,
         success:1
       });
-  })
+  });
 module.exports = router;

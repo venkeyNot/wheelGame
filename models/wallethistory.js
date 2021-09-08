@@ -16,10 +16,11 @@ module.exports = (sequelize, DataTypes) => {
   walletHistory.init({
     user_id: DataTypes.BIGINT,
     game_id: DataTypes.BIGINT,
-    amount: DataTypes.BIGINT,
-    balance: DataTypes.BIGINT,
+    amount: DataTypes.DOUBLE,
+    balance: DataTypes.DOUBLE,
     credit_debit: DataTypes.ENUM('credit','debit'),
     type: DataTypes.ENUM('game','bonus','deposit'),
+    wallet_type: DataTypes.ENUM('wallet','earnings','gulkan_points'),
     comment: DataTypes.TEXT
   }, {
     sequelize,

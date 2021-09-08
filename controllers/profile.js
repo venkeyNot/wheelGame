@@ -9,12 +9,12 @@ exports.profile=(req,res,next)=>{
 
    User.findByPk(req.userData.userId).then(user=>{
   var amount = user.wallet+user.earnings;
-  
-  data= Object.assign(user,{amount:amount});
-  // user.push({amount:amount});
+  // var data =[];
+  // data= {amount:amount};
+  //  user.push(data);
     res.status(200).json({
 
-      user:data,
+      user:user,
      // amount:amount,
 
     });

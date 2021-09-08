@@ -22,6 +22,21 @@ exports.create = (req, res) => {
             success:0
           });
       }else{
+        var refer_id='';
+        if (!req.body.referral_id) {
+
+            var referral= await User.findOne({where:{your_id:req.body.referral_id}});
+            if(referral){
+
+                var refer_id=referral.id;
+            }else{
+
+                res.status(400).send({
+                    message: "Invalid Referral Id"
+                  });
+
+            }
+          }
 
         bcrypt.hash(req.body.password,10,(err,hash)=>{
 
@@ -34,19 +49,27 @@ exports.create = (req, res) => {
 
                 const newUser = {
                     name:req.body.name,
-                   // email:req.body.email,
+                    referral_id:refer_id,
                     mobile:req.body.mobile,
-                    your_id:floor(Math.random() * (999999999 - 1000000) + 1000000),
                     password: hash,
                     otp:Math.floor(Math.random() * (999999 - 100000) + 100000)
                   };
                   User.create(newUser)
                   .then(async data => {
-
-                    var setting = await Setting.findOne({where:{slug:'registration_bonus'}});
+                    var referBonusSetting = await Setting.findOne({where:{slug:'refer_bonus'}});
+                    var registerBonusSetting = await Setting.findOne({where:{slug:'registration_bonus'}});
                     console.log(setting);
-                    var bonus= setting.option;
 
+                    if(refer_id){
+
+                        await User.update({wallet:bonus},{where:{id:refer_id}});
+                        await walletHistory.create({
+                          user_id:data.id,amount:bonus,balance:bonus,credit_debit:'credit',type:'bonus',comment:'Registration Bonus'
+                        });
+
+                    }
+                    var referBonus= referBonusSetting.option;
+                    var registerBonus= registerBonusSetting.option;
                     await User.update({wallet:bonus},{where:{id:data.id}});
                     await walletHistory.create({
                       user_id:data.id,amount:bonus,balance:bonus,credit_debit:'credit',type:'bonus',comment:'Registration Bonus'

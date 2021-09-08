@@ -24,6 +24,9 @@ module.exports = {
       earnings: {
         type: Sequelize.DOUBLE
       },
+      gulkan_points: {
+        type: Sequelize.DOUBLE
+      },
       password: {
         type: Sequelize.STRING
       },
@@ -55,6 +58,12 @@ module.exports = {
       },
       UPI: {
         type: Sequelize.TEXT
+      },
+      your_id: {
+        type: Sequelize.STRING
+      },
+      referral_id: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
