@@ -13,6 +13,7 @@ var walletBalance = require('../middleware/walletBalance');
 var withdrawController = require('../controllers/withdrawController');
 var redisController = require('../controllers/redisController');
 var testController = require('../controllers/testController');
+var settingController = require('../controllers/settingController');
 /* GET home page. */
 router.post('/register',userController.create);
 router.post('/users',userController.findAll);
@@ -41,12 +42,14 @@ router.get('/game', gameController.games);
 router.post('/result', gameController.result);
 
 router.post('/test', testController.test);
-router.get('/create', redisController.create);
-router.get('/connect', redisController.connect);
+// router.get('/create', redisController.create);
+// router.get('/connect', redisController.connect);
+// router.get('/pusher', redisController.pusher);
 router.get('/withdraws',userAuth, withdrawController.withdrawRequests);
 router.post('/withdraw/request',userAuth, withdrawController.request);
 
-
+router.get('/setting', settingController.settings);
+router.get('/siteSetting', settingController.siteSettings);
 router.post('/upload/profile_pic', upload.single('profile_pic'), function (req, res, next) {
     let extArray = req.file.mimetype.split("/");
     let extension = extArray[extArray.length - 1];

@@ -36,7 +36,7 @@ exports.create = (req, res) => {
                     name:req.body.name,
                    // email:req.body.email,
                     mobile:req.body.mobile,
-                    your_id:floor(Math.random() * (999999999 - 1000000) + 1000000),
+                    your_id:Math.floor(Math.random() * (999999999 - 1000000) + 1000000),
                     password: hash,
                     otp:Math.floor(Math.random() * (999999 - 100000) + 100000)
                   };

@@ -30,7 +30,7 @@ module.exports = {
         type: Sequelize.BIGINT
       },
       status: {
-        type: Sequelize.ENUM('pending','stopped','completed')
+        type: Sequelize.ENUM('started','stopped','closed')
       },
       startTime: {
         type: Sequelize.DATE

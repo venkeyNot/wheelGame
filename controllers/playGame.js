@@ -1,10 +1,21 @@
 const db = require("../models");
-const gamePlays = db.gamePlays;
+const gamePlays = db.gamePlay;
 const User = db.user;
 const Color = db.color;
 const gamePosition = db.gamePosition;
 const walletHistory=db.walletHistory;
+const siteSetting = db.siteSetting;
 const Op = db.Sequelize.Op;
+const Pusher = require("pusher");
+
+const pusher = new Pusher({
+   appId: "1263492",
+   key: "ee1c78c99a222d043d29",
+   secret: "a51ea7cbe572d7946ac0",
+   cluster: "ap2",
+   useTLS: true
+ });
+
 
 
 exports.colors= (req,res) => {
@@ -29,13 +40,17 @@ exports.colors= (req,res) => {
 
 };
 
-exports.fetchGame= (req,res) => {
+exports.fetchGame= async (req,res) => {
 
+  var siteSettings= await siteSetting.findByPk(1);
 
+  console.log(siteSettings);
   try{
     gamePlays.findOne({
         order: [ [ 'createdAt', 'DESC' ]],
     }).then(async latestGame=>{
+
+    // if(latestGame.status=='started'){
     var recentColors= await gamePlays.findAll({attributes:['result'],limit:15,order:[['id','DESC']],where:{result:{[Op.not]:null}}});
     var allColors= await Color.findAll();
     var colorTotal={};
@@ -125,8 +140,19 @@ exports.fetchGame= (req,res) => {
             colors:colors,
             colorTotal:colorTotal
         });
+      // }
+      
+      // else{
 
+      //   res.status(200).json({
+      //     success:1,
+      //     game:'waiting for the New Game',
+      //     time:5
+      // });
+
+      // }
     });
+    
   }catch (err){
 
     next(err);
@@ -150,6 +176,9 @@ exports.play = async (req, res, next) => {
       });
 
     }else{
+      var gameServer= await gamePlays.findByPk(req.body.game_play_id);
+      console.log(gameServer);
+      if(gameServer.status=='started'){
 
       if(amount>=player.wallet){
 
@@ -174,7 +203,7 @@ exports.play = async (req, res, next) => {
       }
 
       var color = await Color.findByPk(req.body.option);
-console.log(color);
+      console.log(color);
       const newPlay = {
         user_id:userId,
         game_id:1,
@@ -186,12 +215,25 @@ console.log(color);
       gamePosition.create(newPlay)
       .then(data => {
 
+        pusher.trigger("game."+req.body.game_play_id+"", "play", {
+          option: req.body.amount,
+          color:color.slug,
+          user_id:userId
+        });
         res.status(200).send({
             message: "Game Placed Successfully",
             data: data,
             success:1
           });
       });
+
+    }else{
+
+      res.status(200).send({
+        message: "Game is  Not running",
+        success:0,
+      });
+    }
     }
 
 };

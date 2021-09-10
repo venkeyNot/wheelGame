@@ -1,9 +1,8 @@
 var express = require('express');
 var router = express.Router();
+var registerController = require('../controllers/registerController');
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
-
-
+router.get('/',registerController.create);
+router.post('/register',registerController.create);
+router.post('/verifyMobile',registerController.verifyMobile);
 module.exports = router;

@@ -6,24 +6,24 @@ const Op = db.Sequelize.Op;
 const bcrypt= require('bcrypt');
 // Create and Save a new Tutorial
 exports.create = (req, res) => {
-    if (!req.body.name ||  !req.body.mobile || !req.body.password  ) {
+    if (!req.body.mobile || !req.body.password) {
         res.status(400).send({
           message: "Fields required"
         });
       }
 
       var condition =  { mobile:req.body.mobile };
-      var user = User.findAll({ where: condition }).then(userData=>{
+      var user = User.findAll({ where: condition }).then( async userData=>{
 
       if(userData.length>0){
 
-        res.status(500).json({
+        res.status(200).json({
             message: "Number Already Exist",
             success:0
           });
       }else{
         var refer_id='';
-        if (!req.body.referral_id) {
+        if (req.body.referral_id) {
 
             var referral= await User.findOne({where:{your_id:req.body.referral_id}});
             if(referral){
@@ -31,7 +31,7 @@ exports.create = (req, res) => {
                 var refer_id=referral.id;
             }else{
 
-                res.status(400).send({
+                res.status(200).send({
                     message: "Invalid Referral Id"
                   });
 
@@ -57,27 +57,39 @@ exports.create = (req, res) => {
                   User.create(newUser)
                   .then(async data => {
                     var referBonusSetting = await Setting.findOne({where:{slug:'refer_bonus'}});
-                    var registerBonusSetting = await Setting.findOne({where:{slug:'registration_bonus'}});
-                    console.log(setting);
+                    var registerBonusSetting = await Setting.findOne({where:{slug:'refer_register_bonus'}});
+                    var welcomeBonusSetting = await Setting.findOne({where:{slug:'registration_bonus'}});
+             //       console.log(setting);
 
                     if(refer_id){
 
-                        await User.update({wallet:bonus},{where:{id:refer_id}});
+                      var referUser= await User.findByPk(refer_id);
+                      
+                      var refWallet = referUser.wallet+referBonusSetting.option;
+                      var refBalance= refWallet+referUser.earnings;
+                        await User.update({wallet:refWallet},{where:{id:refer_id}});
+                        await User.update({wallet:registerBonusSetting.option},{where:{id:data.id}});
                         await walletHistory.create({
-                          user_id:data.id,amount:bonus,balance:bonus,credit_debit:'credit',type:'bonus',comment:'Registration Bonus'
+                          user_id:data.id,amount:registerBonusSetting.option,balance:registerBonusSetting.option,credit_debit:'credit',type:'bonus',comment:'Registration Bonus'
+                        });
+                        await walletHistory.create({
+                          user_id:refer_id,amount:referBonusSetting.option,balance:refBalance,credit_debit:'credit',type:'bonus',comment:'Referral Registration Bonus'
                         });
 
                     }
-                    var referBonus= referBonusSetting.option;
-                    var registerBonus= registerBonusSetting.option;
-                    await User.update({wallet:bonus},{where:{id:data.id}});
+                    var welcomeBonus= welcomeBonusSetting.option;
+                    var newUser= await User.findByPk(data.id);
+                    var userWallet = newUser.wallet+welcomeBonus;
+                    var userBalance= userWallet+newUser.earnings;
+
+                   await User.update({wallet:userWallet},{where:{id:data.id}});
                     await walletHistory.create({
-                      user_id:data.id,amount:bonus,balance:bonus,credit_debit:'credit',type:'bonus',comment:'Registration Bonus'
+                      user_id:data.id,amount:welcomeBonus,balance:userBalance,credit_debit:'credit',type:'bonus',comment:'Welcome Bonus'
                     });
 
                     res.status(200).send({
                         message: "OTP Sent to Your Mobile Number",
-                        data: data,
+                        data: data.mobile,
                         success:1
                       });
                   });
@@ -137,10 +149,13 @@ exports.findAllPublished = (req, res) => {
 };
 
 
-exports.verifyMobile = (req, res) => {
+exports.verifyMobile = async(req, res) => {
     const ids = req.body.id;
     const otp = req.body.otp;
-    User.findByPk(ids)
+    console.log(ids);
+    var user =await User.findOne({where:{mobile:ids}});
+    console.log(user);
+    User.findByPk(user.id)
     .then(data => {
       if(data.otp== otp){
 
@@ -148,7 +163,7 @@ exports.verifyMobile = (req, res) => {
             mobile_verified:"yes"
         };
 
-        User.update(values,{where: {id:ids}}).then(num=>{
+        User.update(values,{where: {id:user.id}}).then(num=>{
 
             res.status(200).send({
                 message: "Mobile Verified Successfully",
@@ -160,15 +175,15 @@ exports.verifyMobile = (req, res) => {
  
       }else{
 
-        res.status(500).send({
+        res.status(200).send({
             message: "Invalid OTP",
             success:0
           });
       }
     })
     .catch(err => {
-      res.status(500).send({
-        message: "Error retrieving Tutorial with id=" + id
+      res.status(200).send({
+        message: "Error retrieving Tutorial with id="
       });
     });
 };
