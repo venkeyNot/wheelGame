@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     time: DataTypes.BIGINT,
     time_left: DataTypes.BIGINT,
     status:DataTypes.ENUM('started','stopped','closed'),
+    refund_status:DataTypes.ENUM('pending','success'),
     startTime: DataTypes.DATE,
     endTime: DataTypes.DATE
   }, {

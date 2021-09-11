@@ -35,6 +35,7 @@ var search = req.body.search;
 
 exports.request= (req,res,next) => {
     var user_id= req.userData.userId;
+    var amount =req.body.amount;
       try{
         User.findByPk(user_id).then(async userData=>{
 
@@ -44,11 +45,16 @@ exports.request= (req,res,next) => {
         [Op.lt]: NOW
       }}});
       var setting = await Setting.findOne({where:{slug:'max_withdrawls_per_day'}});
+      var freeWithdrwal = await Setting.findOne({where:{slug:'free_withdrawls_per_day'}});
+      var withdrwalFee = await Setting.findOne({where:{slug:'withdrawl_fee'}});
       if(todayWithdrawls.length<setting.option){
 
+        var fee=0;
+        if(todayWithdrawls.length>=freeWithdrwal.option){
 
+          var fee= (amount/100)*withdrwalFee.option;
+        }
 
-      
             var bankDetails= {
 
                 bankAccountNumber:userData.bankAccountNumber,
@@ -60,18 +66,30 @@ exports.request= (req,res,next) => {
             };
 
            // var newWallet = parseInt(userData.earnings)-parseInt(amount);
-           var newWallet =0;
+            console.log(amount);
+           if(amount<=userData.earnings){
+
+            var newWallet =userData.earnings-amount;
             await User.update({earnings:newWallet},{where:{id:user_id}});
             await withdrawRequest.create({
-              user_id:user_id,amount:userData.earnings,bankDetails:JSON.stringify(bankDetails),comment:'credit',status:'pending'
+              user_id:user_id,amount:amount,fee:fee,bankDetails:JSON.stringify(bankDetails),comment:'credit',status:'pending'
             });
 
             res.status(200).json({
 
-              message:"money "+amount+" credited successfully",
+              message:"Amount "+amount+" Withdraw requested successfully",
               success:1
             });
+          }else{
 
+
+            res.status(200).json({
+  
+              message:"Insufficient Balance",
+              success:0
+            });
+  
+          }
           }else{
 
             res.status(200).json({
@@ -82,7 +100,7 @@ exports.request= (req,res,next) => {
 
 
           }
-
+  
         });
        
       }catch (err){
@@ -92,3 +110,4 @@ exports.request= (req,res,next) => {
     
     };
     
+ 

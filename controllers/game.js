@@ -22,7 +22,7 @@ exports.games= async (req,res) => {
     if(getGame.status=='started'){
 
 
-      await gamePlay.update({status:'stopped'},{where:{id:getGame.id}});
+      await gamePlay.update({status:'stopped',refund_status:'pending'},{where:{id:getGame.id}});
 
     }
 

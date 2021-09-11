@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class walletHistory extends Model {
+  class depositRequest extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -13,18 +13,15 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   };
-  walletHistory.init({
+  depositRequest.init({
     user_id: DataTypes.BIGINT,
-    game_id: DataTypes.BIGINT,
-    amount: DataTypes.DOUBLE,
-    balance: DataTypes.DOUBLE,
-    credit_debit: DataTypes.ENUM('credit','debit'),
-    type: DataTypes.ENUM('game','bonus','deposit','refund'),
-    wallet_type: DataTypes.ENUM('wallet','earnings','gulkan_points'),
-    comment: DataTypes.TEXT
+    amount: DataTypes.BIGINT,
+    screenshot: DataTypes.TEXT,
+    comment: DataTypes.TEXT,
+    status: DataTypes.ENUM('pending','hold','rejected','completed','failed')
   }, {
     sequelize,
-    modelName: 'walletHistory',
+    modelName: 'depositRequests',
   });
-  return walletHistory;
+  return depositRequest;
 };

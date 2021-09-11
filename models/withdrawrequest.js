@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
   withdrawRequest.init({
     user_id: DataTypes.BIGINT,
     amount: DataTypes.BIGINT,
+    fee: DataTypes.DOUBLE,
     bankDetails: DataTypes.TEXT,
     comment: DataTypes.TEXT,
     status: DataTypes.ENUM('pending','hold','rejected','completed','failed')

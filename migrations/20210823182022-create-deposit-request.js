@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('walletHistories', {
+    await queryInterface.createTable('depositRequests', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -11,23 +11,15 @@ module.exports = {
       user_id: {
         type: Sequelize.BIGINT
       },
-      game_id: {
-        type: Sequelize.BIGINT
-      },
       amount: {
         type: Sequelize.BIGINT
       },
-      balance: {
-        type: Sequelize.BIGINT
-      },
-      credit_debit: {
-        type: Sequelize.DataTypes.ENUM('credit','debit')
-      },
-      type: {
-        type: Sequelize.ENUM('game','bonus','deposit','refund')
-      },
+ 
       comment: {
         type: Sequelize.TEXT
+      },
+      status: {
+        type: Sequelize.ENUM('pending','hold','rejected','completed','failed')
       },
       createdAt: {
         allowNull: false,
@@ -36,10 +28,19 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
+      },
+
+      created_at: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      updated_at: {
+        allowNull: false,
+        type: Sequelize.DATE
       }
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('walletHistories');
+    await queryInterface.dropTable('depositRequests');
   }
 };

@@ -30,7 +30,7 @@ router.post('/profile/changePassword',userAuth, profileController.changePassword
 
 
 router.post('/wallet/history',userAuth, walletController.history);
-router.post('/wallet/recharge',userAuth, walletController.recharge);
+// router.post('/wallet/recharge',userAuth, walletController.recharge);
 router.get('/wallet/gulkanToWallet',userAuth, walletController.transferGulkan);
 
 router.get('/fetchGame', playGameController.fetchGame);
@@ -47,10 +47,21 @@ router.post('/test', testController.test);
 // router.get('/pusher', redisController.pusher);
 router.get('/withdraws',userAuth, withdrawController.withdrawRequests);
 router.post('/withdraw/request',userAuth, withdrawController.request);
-
+router.post('/deposit/request',userAuth, walletController.depositRequest);
 router.get('/setting', settingController.settings);
 router.get('/siteSetting', settingController.siteSettings);
 router.post('/upload/profile_pic', upload.single('profile_pic'), function (req, res, next) {
+    let extArray = req.file.mimetype.split("/");
+    let extension = extArray[extArray.length - 1];
+    var file=req.file.filename+'.'+extension;
+    res.status(200).send({
+        message: "Profile Picture Uploaded Successfully",
+        image:file,
+        success:1
+      });
+  });
+
+  router.post('/upload', upload.single('image'), function (req, res, next) {
     let extArray = req.file.mimetype.split("/");
     let extension = extArray[extArray.length - 1];
     var file=req.file.filename+'.'+extension;

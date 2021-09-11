@@ -2,6 +2,7 @@ const db = require("../models");
 const walletHistory=db.walletHistory;
 const Setting = db.setting;
 const User = db.user;
+const depositRequests= db.depositRequest;
 const Op = db.Sequelize.Op;
 
 
@@ -55,41 +56,68 @@ var search = req.body.search;
 
 };
 
+exports.depositRequest= (req,res,next) => {
+  var user_id= req.userData.userId;
+  var amount = req.body.amount;
+  var screenshot= req.body.screenshot;
+     try{
+      User.findByPk(user_id).then(async userProfile=>{
 
-exports.recharge= (req,res,next) => {
-    var user_id= req.userData.userId;
-    var amount = req.body.amount;
-      try{
-        User.findByPk(user_id).then(async userProfile=>{
-       //   var setting = await Setting.findOne({where:{slug:'gulkan_points_percent'}});
-            var newWallet = parseInt(userProfile.wallet)+parseInt(amount);
-          //  var gulkanPoints= (setting.option/100)*amount;
+
+          await depositRequests.create({
+            user_id:userProfile.id,amount:amount,screenshot:screenshot,status:'pending'
+          });
+          // await walletHistory.create({
+          //   user_id:user_id,game_id:1,amount:gulkanPoints,balance:newGulkanPoints,credit_debit:'credit',type:'bonus',wallet_type:'gulkan_points'
+          // });
+
+          res.status(200).json({
+
+            message:"money "+amount+" Requested successfully",
+            success:1
+          });
+
+      });
+
+    }catch (err){
+
+      next(err);
+    }
+
+  };
+// exports.recharge= (req,res,next) => {
+//     var user_id= req.userData.userId;
+//     var amount = req.body.amount;
+//       try{
+//         User.findByPk(user_id).then(async userProfile=>{
+//        //   var setting = await Setting.findOne({where:{slug:'gulkan_points_percent'}});
+//             var newWallet = parseInt(userProfile.wallet)+parseInt(amount);
+//           //  var gulkanPoints= (setting.option/100)*amount;
           
-            // var newGulkanPoints = parseInt(userProfile.gulkan_points)+parseInt(gulkanPoints);
-            // console.log(newGulkanPoints);
-            await User.update({wallet:newWallet},{where:{id:user_id}});
-            await walletHistory.create({
-              user_id:user_id,game_id:1,amount:amount,balance:newWallet,credit_debit:'credit',type:'deposit',wallet_type:'wallet'
-            });
-            // await walletHistory.create({
-            //   user_id:user_id,game_id:1,amount:gulkanPoints,balance:newGulkanPoints,credit_debit:'credit',type:'bonus',wallet_type:'gulkan_points'
-            // });
+//             // var newGulkanPoints = parseInt(userProfile.gulkan_points)+parseInt(gulkanPoints);
+//             // console.log(newGulkanPoints);
+//             await User.update({wallet:newWallet},{where:{id:user_id}});
+//             await walletHistory.create({
+//               user_id:user_id,game_id:1,amount:amount,balance:newWallet,credit_debit:'credit',type:'deposit',wallet_type:'wallet'
+//             });
+//             // await walletHistory.create({
+//             //   user_id:user_id,game_id:1,amount:gulkanPoints,balance:newGulkanPoints,credit_debit:'credit',type:'bonus',wallet_type:'gulkan_points'
+//             // });
 
-            res.status(200).json({
+//             res.status(200).json({
 
-              message:"money "+amount+" credited successfully",
-              success:1
-            });
+//               message:"money "+amount+" credited successfully",
+//               success:1
+//             });
 
-        });
-       
-      }catch (err){
-    
-        next(err);
-      }
-    
-    };
-    
+//         });
+
+//       }catch (err){
+
+//         next(err);
+//       }
+
+//     };
 
     exports.transferGulkan= (req,res,next) => {
       var user_id= req.userData.userId;
@@ -136,36 +164,36 @@ exports.recharge= (req,res,next) => {
       
       };
       
-      exports.Bakrecharge= (req,res,next) => {
-        var user_id= req.userData.userId;
-        var amount = req.body.amount;
-          try{
-            User.findByPk(user_id).then(async userProfile=>{
-              var setting = await Setting.findOne({where:{slug:'gulkan_points_percent'}});
-                var newWallet = parseInt(userProfile.wallet)+parseInt(amount);
-                var gulkanPoints= (setting.option/100)*amount;
+      // exports.Bakrecharge= (req,res,next) => {
+      //   var user_id= req.userData.userId;
+      //   var amount = req.body.amount;
+      //     try{
+      //       User.findByPk(user_id).then(async userProfile=>{
+      //         var setting = await Setting.findOne({where:{slug:'gulkan_points_percent'}});
+      //           var newWallet = parseInt(userProfile.wallet)+parseInt(amount);
+      //           var gulkanPoints= (setting.option/100)*amount;
               
-                var newGulkanPoints = parseInt(userProfile.gulkan_points)+parseInt(gulkanPoints);
-                console.log(newGulkanPoints);
-                await User.update({wallet:newWallet,gulkan_points:newGulkanPoints},{where:{id:user_id}});
-                await walletHistory.create({
-                  user_id:user_id,game_id:1,amount:amount,balance:newWallet,credit_debit:'credit',type:'deposit',wallet_type:'wallet'
-                });
-                await walletHistory.create({
-                  user_id:user_id,game_id:1,amount:gulkanPoints,balance:newGulkanPoints,credit_debit:'credit',type:'bonus',wallet_type:'gulkan_points'
-                });
+      //           var newGulkanPoints = parseInt(userProfile.gulkan_points)+parseInt(gulkanPoints);
+      //           console.log(newGulkanPoints);
+      //           await User.update({wallet:newWallet,gulkan_points:newGulkanPoints},{where:{id:user_id}});
+      //           await walletHistory.create({
+      //             user_id:user_id,game_id:1,amount:amount,balance:newWallet,credit_debit:'credit',type:'deposit',wallet_type:'wallet'
+      //           });
+      //           await walletHistory.create({
+      //             user_id:user_id,game_id:1,amount:gulkanPoints,balance:newGulkanPoints,credit_debit:'credit',type:'bonus',wallet_type:'gulkan_points'
+      //           });
     
-                res.status(200).json({
+      //           res.status(200).json({
     
-                  message:"money "+amount+" credited successfully",
-                  success:1
-                });
+      //             message:"money "+amount+" credited successfully",
+      //             success:1
+      //           });
     
-            });
+      //       });
            
-          }catch (err){
+      //     }catch (err){
         
-            next(err);
-          }
+      //       next(err);
+      //     }
         
-        };
+      //   };
