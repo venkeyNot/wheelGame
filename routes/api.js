@@ -14,6 +14,7 @@ var withdrawController = require('../controllers/withdrawController');
 var redisController = require('../controllers/redisController');
 var testController = require('../controllers/testController');
 var settingController = require('../controllers/settingController');
+var bonusController = require('../controllers/bonusController');
 /* GET home page. */
 router.post('/register',userController.create);
 router.post('/users',userController.findAll);
@@ -50,6 +51,9 @@ router.post('/withdraw/request',userAuth, withdrawController.request);
 router.post('/deposit/request',userAuth, walletController.depositRequest);
 router.get('/setting', settingController.settings);
 router.get('/siteSetting', settingController.siteSettings);
+router.get('/createDailyBonus', bonusController.createDailyBonus);
+router.post('/claimBonus',userAuth, bonusController.claimBonus);
+router.get('/dailyBonus', userAuth, bonusController.dailyBonus);
 router.post('/upload/profile_pic', upload.single('profile_pic'), function (req, res, next) {
     let extArray = req.file.mimetype.split("/");
     let extension = extArray[extArray.length - 1];

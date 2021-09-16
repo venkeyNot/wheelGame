@@ -107,13 +107,17 @@ exports.resetPassword = (req, res) => {
     }else{
 
   
-  
+              otp=Math.floor(Math.random() * (999999 - 100000) + 100000);
               const updateUser = {
 
-                  otp:Math.floor(Math.random() * (999999 - 100000) + 100000)
+                  otp:otp
                 };
                 User.update(updateUser,{where:{id:userData.id}})
                 .then(async data => {
+
+                  var message = 'Dear Customer! Your BIGSPG Login OTP is '+otp+'.';
+
+                  await fetch('http://server2.smsnot.com/v2/sendSMS?username=spingame&message='+message+'&sendername=EBSPIG&smstype=TRANS&numbers='+req.body.mobile+'&apikey=0d387439-f834-4e0e-98eb-cb9e4dd5a10b&peid=1201163102281800017&templateid=1207163153499355887');
 
                   res.status(200).send({
                       message: "OTP Sent to Your Mobile Number",

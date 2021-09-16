@@ -42,4 +42,5 @@ db.setting = require("./setting.js")(sequelize, Sequelize);
 db.withdrawRequest = require("./withdrawrequest.js")(sequelize, Sequelize);
 db.depositRequest = require("./depositrequest.js")(sequelize, Sequelize);
 db.siteSetting = require("./sitesetting.js")(sequelize, Sequelize);
+db.userDailyBonus = require("./userdailybonus.js")(sequelize, Sequelize);
 module.exports = db;

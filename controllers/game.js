@@ -37,7 +37,30 @@ exports.games= async (req,res) => {
    var gameServerTime = setInterval(game,60000);
    var siteSettings= await siteSetting.findByPk(1);
 
-     function game(){
+     async function game(){
+
+      var runningGames =  await  gamePlay.count({where:{status:'started'}});
+    console.log("runningGames");
+    console.log(runningGames);
+
+    if(runningGames>1){
+
+      try{
+        await gamePlay.update({status:'stopped',refund_status:'pending'},{where:{status:'started'}});
+      clearInterval(gameServerTime);
+      clearInterval(reduceResultTime);
+      clearInterval(reduceTime);
+      }catch(err){
+
+
+      }
+      
+
+    }
+
+
+
+
 
       var data= {game_id:1,time:60,time_left:40};
 
@@ -142,7 +165,7 @@ exports.games= async (req,res) => {
                       var newEarnings= winner.earnings+totalWinAmount;
                       var newBalance = winner.wallet+newEarnings;
                       var gulkanPoints= (setting.option/100)*totalWinAmount;
-                      var newGulkanPoints = parseInt(winner.gulkan_points)+parseInt(gulkanPoints);
+                      var newGulkanPoints = parseFloat(winner.gulkan_points)+parseFloat(gulkanPoints);
 
                       await User.update({earnings:newEarnings,gulkan_points:newGulkanPoints},{where:{id:gameWinner.user_id}});
                       await walletHistory.create({

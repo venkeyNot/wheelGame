@@ -39,7 +39,7 @@ exports.request= (req,res,next) => {
       try{
         User.findByPk(user_id).then(async userData=>{
 
-          var todayWithdrawls= await withdrawRequest.findAll({  where: { user_id:user_id,
+          var todayWithdrawls= await withdrawRequest.count({  where: { user_id:user_id,
             createdAt: { 
         [Op.gt]: TODAY_START,
         [Op.lt]: NOW
@@ -47,10 +47,10 @@ exports.request= (req,res,next) => {
       var setting = await Setting.findOne({where:{slug:'max_withdrawls_per_day'}});
       var freeWithdrwal = await Setting.findOne({where:{slug:'free_withdrawls_per_day'}});
       var withdrwalFee = await Setting.findOne({where:{slug:'withdrawl_fee'}});
-      if(todayWithdrawls.length<setting.option){
+      if(todayWithdrawls<setting.option){
 
         var fee=0;
-        if(todayWithdrawls.length>=freeWithdrwal.option){
+        if(todayWithdrawls>=freeWithdrwal.option){
 
           var fee= (amount/100)*withdrwalFee.option;
         }

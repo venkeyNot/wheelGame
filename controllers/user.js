@@ -4,8 +4,10 @@ const Setting = db.setting;
 const walletHistory=db.walletHistory;
 const Op = db.Sequelize.Op;
 const bcrypt= require('bcrypt');
+var http = require("http");
 // Create and Save a new Tutorial
 exports.create = (req, res) => {
+
     if (!req.body.name ||  !req.body.mobile || !req.body.password  ) {
         res.status(400).send({
           message: "Fields required"
@@ -31,17 +33,22 @@ exports.create = (req, res) => {
                     message: "failed",
                   });
             }else{
-
+              var otp =Math.floor(Math.random() * (999999 - 100000) + 100000);
                 const newUser = {
                     name:req.body.name,
                    // email:req.body.email,
                     mobile:req.body.mobile,
                     your_id:Math.floor(Math.random() * (999999999 - 1000000) + 1000000),
                     password: hash,
-                    otp:Math.floor(Math.random() * (999999 - 100000) + 100000)
+                    otp:otp
                   };
                   User.create(newUser)
                   .then(async data => {
+                    var message = 'Dear Customer! Your BIGSPG Login OTP is '+otp+'.';
+
+                   var url = 'http://server2.smsnot.com/v2/sendSMS?username=spingame&message='+message+'&sendername=EBSPIG&smstype=TRANS&numbers='+req.body.mobile+'&apikey=0d387439-f834-4e0e-98eb-cb9e4dd5a10b&peid=1201163102281800017&templateid=1207163153499355887';
+      
+                  await http.get(url);
 
                     var setting = await Setting.findOne({where:{slug:'registration_bonus'}});
                     console.log(setting);
