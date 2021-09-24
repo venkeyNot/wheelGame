@@ -42,7 +42,7 @@ router.post('/play',[userAuth,walletBalance], playGameController.play);
 router.get('/game', gameController.games);
 router.post('/result', gameController.result);
 
-router.post('/test', testController.test);
+router.get('/test', testController.test);
 // router.get('/create', redisController.create);
 // router.get('/connect', redisController.connect);
 // router.get('/pusher', redisController.pusher);

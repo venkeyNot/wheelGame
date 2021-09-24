@@ -192,41 +192,41 @@ exports.games= async (req,res) => {
                     }
 
    
-                                  var todayEarnings= await adminEarning.findAndCountAll({  where: { 
-                                    createdAt:{ 
-                                      [Op.gt]: TODAY_START,
-                                      [Op.lt]: NOW
-                                    },
-                                    }});
+                                  // var todayEarnings= await adminEarning.findAndCountAll({  where: { 
+                                  //   createdAt:{ 
+                                  //     [Op.gt]: TODAY_START,
+                                  //     [Op.lt]: NOW
+                                  //   },
+                                  //   }});
                               
 
-                                    var date= moment().format('YYYY-MM-DD');
-                                    var winGameColorAmount= oneGameColorAmount[result];
-                                    var adminProfit= totalPlacedAmount-winGameColorAmount;
-                                    // console.log("placedamount");
-                                    // console.log(totalPlacedAmount);
+                                  //   var date= moment().format('YYYY-MM-DD');
+                                  //   var winGameColorAmount= oneGameColorAmount[result];
+                                  //   var adminProfit= totalPlacedAmount-winGameColorAmount;
+                                  //   // console.log("placedamount");
+                                  //   // console.log(totalPlacedAmount);
 
-                                    console.log("wincolor");
-                                    console.log(winGameColorAmount);
+                                  //   console.log("wincolor");
+                                  //   console.log(winGameColorAmount);
 
-                                    console.log("Admin Profit");
-                                    console.log(adminProfit);
+                                  //   console.log("Admin Profit");
+                                  //   console.log(adminProfit);
 
-                                  if(todayEarnings.count<1){
+                                  // if(todayEarnings.count<1){
 
-                                    await  adminEarning.create({date:date,amount:adminProfit,day:1})
+                                  //   await  adminEarning.create({date:date,amount:adminProfit,day:1})
 
-                                  }else{
+                                  // }else{
                                   
 
-                                    var adminEarningId= todayEarnings.rows[0].id;
-                                    var fetchEarning= await adminEarning.findByPk(adminEarningId);
-                                    var newAdminEarnings= fetchEarning.amount + adminProfit;
-                                    await adminEarning.update({amount:newAdminEarnings},{where:{id:adminEarningId}});
+                                  //   var adminEarningId= todayEarnings.rows[0].id;
+                                  //   var fetchEarning= await adminEarning.findByPk(adminEarningId);
+                                  //   var newAdminEarnings= fetchEarning.amount + adminProfit;
+                                  //   await adminEarning.update({amount:newAdminEarnings},{where:{id:adminEarningId}});
 
 
 
-                                  }
+                                  // }
 
 
                     var reduceResultTime=setInterval(resultTime,1000);

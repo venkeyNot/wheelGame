@@ -4,6 +4,7 @@ const userDailyBonus=db.userDailyBonus;
 const User = db.user;
 const Op = db.Sequelize.Op;
 const walletHistory=db.walletHistory;
+process.env.TZ = "Asia/Calcutta";
 // const TODAY_START = new Date().setHours(0, 0, 0, 0);
 const NOW = new Date();
 const moment = require('moment');

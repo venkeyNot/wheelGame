@@ -1,4 +1,5 @@
 const db = require("../models");
+process.env.TZ = "Asia/Calcutta";
 const User = db.user;
 const Setting = db.setting;
 const walletHistory=db.walletHistory;
@@ -16,12 +17,27 @@ exports.create = (req, res) => {
       var condition =  { mobile:req.body.mobile };
       var user = User.findAll({ where: condition }).then( async userData=>{
 
-      if(userData.length>0){
+      if(userData.length>=1){
+
+        if(userData[0].mobile_verified=='yes'){
 
         res.status(200).json({
             message: "Number Already Exist",
             success:0
           });
+
+        }else{
+
+          var otp= Math.floor(Math.random() * (999999 - 100000) + 100000);
+          await User.update({otp:otp},{where:{id:userData[0].id}});
+
+          res.status(200).send({
+            message: "OTP Sent to Your Mobile Number",
+            data: data.mobile,
+            success:1
+          });
+
+        }
       }else{
         var refer_id='';
         if (req.body.referral_id) {

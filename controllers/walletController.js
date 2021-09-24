@@ -1,4 +1,5 @@
 const db = require("../models");
+process.env.TZ = "Asia/Calcutta";
 const walletHistory=db.walletHistory;
 const Setting = db.setting;
 const User = db.user;

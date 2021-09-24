@@ -55,7 +55,7 @@ exports.fetchGame= async (req,res) => {
     var allColors= await Color.findAll();
     var colorTotal={};
     var gamePlayId= latestGame.id;
-    console.log(gamePlayId);
+    // console.log(gamePlayId);
     for(let oneColor of allColors){
    
       var colorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id}});
@@ -107,7 +107,7 @@ exports.fetchGame= async (req,res) => {
    
       
       var colorAmount=0;
-      console.log(colorPositions);
+      // console.log(colorPositions);
       for(let colorPosition of colorPositions){
    
          colorAmount +=  parseInt(colorPosition.amount);
@@ -177,7 +177,7 @@ exports.play = async (req, res, next) => {
 
     }else{
       var gameServer= await gamePlays.findByPk(req.body.game_play_id);
-      console.log(gameServer);
+      // console.log(gameServer);
       if(gameServer.status=='started'){
 
       if(amount>=player.wallet){

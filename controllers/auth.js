@@ -1,10 +1,11 @@
 const db = require("../models");
+process.env.TZ = "Asia/Calcutta";
 const User = db.user;
 const Op = db.Sequelize.Op;
 const jwt = require('jsonwebtoken');
 const bcrypt= require('bcrypt');
 require('dotenv').config();
-
+var http = require("http");
 exports.login = async(req, res) => {
 
     var condition = {mobile:req.body.mobile};
@@ -20,6 +21,8 @@ exports.login = async(req, res) => {
         bcrypt.compare(req.body.password,data[0].password,async(err,result)=>{
 
             if(result){
+             
+              if(data[0].mobile_verified	=='yes'){
               const token= jwt.sign({
 
                 mobile:data[0].password,
@@ -34,6 +37,16 @@ exports.login = async(req, res) => {
                 data:user,
                 success:1,
               });
+            
+            }else{
+
+              return res.status(200).json({
+                message:'Invalid login Details',
+                success:0,
+                data:result
+              });
+
+              }
             }else{
 
               return res.status(401).json({
@@ -95,19 +108,19 @@ exports.resetPassword = (req, res) => {
       });
     }
 
-    var condition =  { mobile:req.body.mobile };
+    var condition =  { mobile:req.body.mobile ,mobile_verified:'yes'};
     var user = User.findOne({ where: condition }).then(userData=>{
 
     if(!userData){
 
-      res.status(500).json({
+      res.status(200).json({
           message: "Mobile Number not Registered with Us",
           success:0
         });
     }else{
 
   
-              otp=Math.floor(Math.random() * (999999 - 100000) + 100000);
+            var  otp=Math.floor(Math.random() * (999999 - 100000) + 100000);
               const updateUser = {
 
                   otp:otp
@@ -117,7 +130,8 @@ exports.resetPassword = (req, res) => {
 
                   var message = 'Dear Customer! Your BIGSPG Login OTP is '+otp+'.';
 
-                  await fetch('http://server2.smsnot.com/v2/sendSMS?username=spingame&message='+message+'&sendername=EBSPIG&smstype=TRANS&numbers='+req.body.mobile+'&apikey=0d387439-f834-4e0e-98eb-cb9e4dd5a10b&peid=1201163102281800017&templateid=1207163153499355887');
+                  var url = 'http://server2.smsnot.com/v2/sendSMS?username=spingame&message='+message+'&sendername=EBSPIG&smstype=TRANS&numbers='+req.body.mobile+'&apikey=0d387439-f834-4e0e-98eb-cb9e4dd5a10b&peid=1201163102281800017&templateid=1207163153499355887';
+                  await http.get(url);
 
                   res.status(200).send({
                       message: "OTP Sent to Your Mobile Number",

@@ -6,7 +6,7 @@ const Op = db.Sequelize.Op;
 const bcrypt= require('bcrypt');
 var http = require("http");
 // Create and Save a new Tutorial
-exports.create = (req, res) => {
+exports.create = async(req, res) => {
 
     if (!req.body.name ||  !req.body.mobile || !req.body.password  ) {
         res.status(400).send({
@@ -15,14 +15,30 @@ exports.create = (req, res) => {
       }
 
       var condition =  { mobile:req.body.mobile };
-      var user = User.findAll({ where: condition }).then(userData=>{
+      var user = User.findAll({ where: condition }).then(async userData=>{
+        if(userData.length>=1){
 
-      if(userData.length>0){
+          if(userData[0].mobile_verified=='yes'){
+  
+          res.status(200).json({
+              message: "Number Already Exist",
+              success:0
+            });
+  
+          }else{
 
-        res.status(500).json({
-            message: "Number Already Exist",
-            success:0
+            bcrypt.hash(req.body.password,10,async (err,hash)=>{
+  
+            var otp= Math.floor(Math.random() * (999999 - 100000) + 100000);
+            await User.update({otp:otp,password:hash},{where:{id:userData[0].id}});
+  
+            res.status(200).send({
+              message: "OTP Sent to Your Mobile Number",
+              data: userData[0],
+              success:1
+            });
           });
+          }
       }else{
 
         bcrypt.hash(req.body.password,10,(err,hash)=>{

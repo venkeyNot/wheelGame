@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class withdrawRequest extends Model {
+  class adminEarning extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -13,17 +13,14 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   };
-  withdrawRequest.init({
-    user_id: DataTypes.BIGINT,
+  adminEarning.init({
+    date: DataTypes.DATE,
+    day: DataTypes.BIGINT,
     amount: DataTypes.BIGINT,
-    fee: DataTypes.DOUBLE,
-    bankDetails: DataTypes.TEXT,
-    comment: DataTypes.TEXT,
-    date:DataTypes.DATE,
-    status: DataTypes.ENUM('pending','hold','rejected','completed','failed')
+    comment: DataTypes.TEXT
   }, {
     sequelize,
-    modelName: 'withdrawRequest',
+    modelName: 'adminEarning',
   });
-  return withdrawRequest;
+  return adminEarning;
 };

@@ -4,21 +4,25 @@
     "password": "swathi",
     "database": "Wheel",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "timezone": "Asia/Calcutta"
   },
   "test": {
     "username": "root",
     "password": "swathi",
     "database": "Wheel",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "timezone": "Asia/Calcutta"
+
   },
   "production": {
     "username": "root",
     "password": "swathi",
     "database": "Wheel",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "timezone": "Asia/Calcutta"
   }
   
 

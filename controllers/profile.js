@@ -1,4 +1,5 @@
 const db = require("../models");
+process.env.TZ = "Asia/Calcutta";
 const User = db.user;
 const Op = db.Sequelize.Op;
 const jwt = require('jsonwebtoken');
