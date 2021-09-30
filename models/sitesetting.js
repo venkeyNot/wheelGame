@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     phone: DataTypes.TEXT,
     payment_barcode: DataTypes.TEXT,
     upi: DataTypes.TEXT,
+    min_android_version:DataTypes.TEXT,
     gameServerStatus: DataTypes.ENUM('start','stop'),
   }, {
     sequelize,

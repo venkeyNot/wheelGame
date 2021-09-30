@@ -4,7 +4,8 @@ const Setting = db.setting;
 const walletHistory=db.walletHistory;
 const Op = db.Sequelize.Op;
 const bcrypt= require('bcrypt');
-var http = require("http");
+var http = require('http');
+var urlencode = require('urlencode');
 // Create and Save a new Tutorial
 exports.create = async(req, res) => {
 
@@ -31,7 +32,33 @@ exports.create = async(req, res) => {
   
             var otp= Math.floor(Math.random() * (999999 - 100000) + 100000);
             await User.update({otp:otp,password:hash},{where:{id:userData[0].id}});
-  
+
+
+                      var message = urlencode('Dear Customer! Your BIGSPG Login OTP is '+otp+'.');
+                  //  var msg=urlencode('hello js');
+                    var number=userData[0].mobile;
+                    var apikey='NjMzMzUyMzUzMTMxNjM0MzQzNzQ2ZDRlNDc0MjU0NDg=';
+                 
+                    var sender='EBSPIG';
+                    var data='apikey='+apikey+'&sender='+sender+'&numbers='+number+'&message='+message
+                    var options = {
+                    host: 'api.textlocal.in',
+                    path: '/send?'+data
+                    };
+                    callback = function(response) {
+                    var str = '';
+                    //another chunk of data has been recieved, so append it to `str`
+                    response.on('data', function (chunk) {
+                    str += chunk;
+                    });
+                    //the whole response has been recieved, so we just print it out here
+                    response.on('end', function () {
+                    console.log(str);
+                    });
+                    }
+                    //console.log('hello js'))
+                    http.request(options, callback).end();
+
             res.status(200).send({
               message: "OTP Sent to Your Mobile Number",
               data: userData[0],
@@ -54,26 +81,53 @@ exports.create = async(req, res) => {
                     name:req.body.name,
                    // email:req.body.email,
                     mobile:req.body.mobile,
-                    your_id:Math.floor(Math.random() * (999999999 - 1000000) + 1000000),
+                    your_id:req.body.mobile,
                     password: hash,
                     otp:otp
                   };
                   User.create(newUser)
                   .then(async data => {
-                    var message = 'Dear Customer! Your BIGSPG Login OTP is '+otp+'.';
 
-                   var url = 'http://server2.smsnot.com/v2/sendSMS?username=spingame&message='+message+'&sendername=EBSPIG&smstype=TRANS&numbers='+req.body.mobile+'&apikey=0d387439-f834-4e0e-98eb-cb9e4dd5a10b&peid=1201163102281800017&templateid=1207163153499355887';
-      
-                  await http.get(url);
 
-                    var setting = await Setting.findOne({where:{slug:'registration_bonus'}});
-                    console.log(setting);
-                    var bonus= setting.option;
-
-                    await User.update({wallet:bonus},{where:{id:data.id}});
-                    await walletHistory.create({
-                      user_id:data.id,amount:bonus,balance:bonus,credit_debit:'credit',type:'bonus',comment:'Registration Bonus'
+                    var message = urlencode('Dear Customer! Your BIGSPG Login OTP is '+otp+'.');
+                  //  var msg=urlencode('hello js');
+                    var number=req.body.mobile;
+                    var apikey='NjMzMzUyMzUzMTMxNjM0MzQzNzQ2ZDRlNDc0MjU0NDg=';
+                 
+                    var sender='EBSPIG';
+                    var data='apikey='+apikey+'&sender='+sender+'&numbers='+number+'&message='+message
+                    var options = {
+                    host: 'api.textlocal.in',
+                    path: '/send?'+data
+                    };
+                    callback = function(response) {
+                    var str = '';
+                    //another chunk of data has been recieved, so append it to `str`
+                    response.on('data', function (chunk) {
+                    str += chunk;
                     });
+                    //the whole response has been recieved, so we just print it out here
+                    response.on('end', function () {
+                    console.log(str);
+                    });
+                    }
+                    //console.log('hello js'))
+                    http.request(options, callback).end();
+
+
+
+                  //  var url = 'http://server2.smsnot.com/v2/sendSMS?username=spingame&message='+message+'&sendername=EBSPIG&smstype=TRANS&numbers='+req.body.mobile+'&apikey=0d387439-f834-4e0e-98eb-cb9e4dd5a10b&peid=1201163102281800017&templateid=1207163153499355887';
+      
+                  // await http.get(url);
+
+                    // var setting = await Setting.findOne({where:{slug:'registration_bonus'}});
+                    // console.log(setting);
+                    // var bonus= setting.option;
+
+                    // await User.update({wallet:bonus},{where:{id:data.id}});
+                    // await walletHistory.create({
+                    //   user_id:data.id,amount:bonus,balance:bonus,credit_debit:'credit',type:'bonus',comment:'Registration Bonus'
+                    // });
 
                     res.status(200).send({
                         message: "OTP Sent to Your Mobile Number",
@@ -142,13 +196,22 @@ exports.verifyMobile = (req, res) => {
     const otp = req.body.otp;
     User.findByPk(ids)
     .then(data => {
-      if(data.otp== otp){
+      if(data.otp== otp && data.mobile_verified=="no"){
 
         let values= {
             mobile_verified:"yes"
         };
 
-        User.update(values,{where: {id:ids}}).then(num=>{
+        User.update(values,{where: {id:ids}}).then(async num=>{
+
+          var setting = await Setting.findOne({where:{slug:'registration_bonus'}});
+          console.log(setting);
+          var bonus= setting.option;
+
+          await User.update({wallet:bonus},{where:{id:data.id}});
+          await walletHistory.create({
+            user_id:data.id,amount:bonus,balance:bonus,credit_debit:'credit',type:'bonus',comment:'Registration Bonus'
+          });
 
             res.status(200).send({
                 message: "Mobile Verified Successfully",

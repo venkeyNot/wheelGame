@@ -43,6 +43,7 @@ exports.colors= (req,res) => {
 exports.fetchGame= async (req,res) => {
 
   var siteSettings= await siteSetting.findByPk(1);
+  var userId = req.userData.userId;
 
   console.log(siteSettings);
   try{
@@ -54,12 +55,15 @@ exports.fetchGame= async (req,res) => {
     var recentColors= await gamePlays.findAll({attributes:['result'],limit:15,order:[['id','DESC']],where:{result:{[Op.not]:null}}});
     var allColors= await Color.findAll();
     var colorTotal={};
+    var myColors ={};
     var gamePlayId= latestGame.id;
     // console.log(gamePlayId);
     for(let oneColor of allColors){
    
       var colorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id}});
+      var myColorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,user_id:userId}});
       var oneColorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:1}});
+      var myOneColorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:1,user_id:userId}});
       // var sumOneColorPosition=0;
       // var sumTwoColorPosition=0;
       // var sumTenColorPosition=0;
@@ -73,33 +77,39 @@ exports.fetchGame= async (req,res) => {
       // }
    
       var twoColorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:2}});
+      var myTwoColorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:2,user_id:userId}});
       // for(twoColorPosition of twoColorPositions){
    
       //  sumTwoColorPosition += twoColorPosition.amount*twoColorPosition.ntimes;
       // }
    
       var tenColorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:10}});
+      var myTenColorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:10,user_id:userId}});
       // for(tenColorPosition of tenColorPositions){
    
       //  sumTenColorPosition += tenColorPosition.amount*tenColorPosition.ntimes;
       // }
    
       var hundredPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:100}});
+      var myHundredPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:100,user_id:userId}});
       // for(hundredPosition of hundredPositions){
    
       //  sumHundredPosition += hundredPosition.amount*hundredPosition.ntimes;
       // }
        var fiveHundredColorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:500}});
+       var myFiveHundredColorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:500,user_id:userId}});
       // for(fiveHundredColorPosition of fiveHundredColorPositions){
    
       //  sumFiveHundredColorPosition += fiveHundredColorPosition.amount*fiveHundredColorPosition.ntimes;
       // }
       var oneKColorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:1000}});
+      var myOneKColorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:1000,user_id:userId}});
       // for(oneKColorPosition of oneKColorPositions){
    
       //  sumOneKColorPosition += oneKColorPosition.amount*oneKColorPosition.ntimes;
       // }
       var fiveKColorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:5000}});
+      var myFiveKColorPositions= await gamePosition.findAll({where:{game_play_id:gamePlayId,option:oneColor.id,amount:5000,user_id:userId}});
       // for(fiveKColorPosition of fiveKColorPositions){
    
       //  sumFiveKColorPosition += fiveKColorPosition.amount*fiveKColorPosition.ntimes;
@@ -107,11 +117,17 @@ exports.fetchGame= async (req,res) => {
    
       
       var colorAmount=0;
+      var myColorAmount=0;
       // console.log(colorPositions);
       for(let colorPosition of colorPositions){
    
          colorAmount +=  parseInt(colorPosition.amount);
       }
+
+      for(let myColorPosition of myColorPositions){
+   
+        myColorAmount +=  parseInt(myColorPosition.amount);
+     }
    
        colorTotal[oneColor.slug] = {
          '1':oneColorPositions.length,
@@ -123,9 +139,22 @@ exports.fetchGame= async (req,res) => {
          '5k':fiveKColorPositions.length,
          total:colorAmount
        };
+      
+       myColors[oneColor.slug] = {
+        '1':myOneColorPositions.length,
+        '2':myTwoColorPositions.length,
+        '10':myTenColorPositions.length,
+        '100':myHundredPositions.length,
+        '500':myFiveHundredColorPositions.length,
+        '1k':myOneKColorPositions.length,
+        '5k':myFiveKColorPositions.length,
+        total:myColorAmount
+      };
    
     }
     var colors =[];
+   
+   
     var i=0;
     for(let recentColor of recentColors){
      var colorName= await Color.findByPk(recentColor.result);
@@ -138,7 +167,8 @@ exports.fetchGame= async (req,res) => {
             success:1,
             game:latestGame,
             colors:colors,
-            colorTotal:colorTotal
+            colorTotal:colorTotal,
+            myColors:myColors
         });
       // }
       

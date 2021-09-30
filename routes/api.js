@@ -34,7 +34,7 @@ router.post('/wallet/history',userAuth, walletController.history);
 // router.post('/wallet/recharge',userAuth, walletController.recharge);
 router.get('/wallet/gulkanToWallet',userAuth, walletController.transferGulkan);
 
-router.get('/fetchGame', playGameController.fetchGame);
+router.get('/fetchGame',userAuth, playGameController.fetchGame);
 router.get('/colors', playGameController.colors);
 router.post('/play',[userAuth,walletBalance], playGameController.play);
 

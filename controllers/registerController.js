@@ -5,7 +5,8 @@ const Setting = db.setting;
 const walletHistory=db.walletHistory;
 const Op = db.Sequelize.Op;
 const bcrypt= require('bcrypt');
-var http = require("http");
+var http = require('http');
+var urlencode = require('urlencode');
 // Create and Save a new Tutorial
 exports.create = (req, res) => {
     if (!req.body.mobile || !req.body.password) {
@@ -30,10 +31,33 @@ exports.create = (req, res) => {
 
           var otp= Math.floor(Math.random() * (999999 - 100000) + 100000);
           await User.update({otp:otp},{where:{id:userData[0].id}});
-
+          var message = urlencode('Dear Customer! Your BIGSPG Login OTP is '+otp+'.');
+          //  var msg=urlencode('hello js');
+            var number=userData[0].mobile;
+            var apikey='NjMzMzUyMzUzMTMxNjM0MzQzNzQ2ZDRlNDc0MjU0NDg=';
+         
+            var sender='EBSPIG';
+            var data='apikey='+apikey+'&sender='+sender+'&numbers='+number+'&message='+message
+            var options = {
+            host: 'api.textlocal.in',
+            path: '/send?'+data
+            };
+            callback = function(response) {
+            var str = '';
+            //another chunk of data has been recieved, so append it to `str`
+            response.on('data', function (chunk) {
+            str += chunk;
+            });
+            //the whole response has been recieved, so we just print it out here
+            response.on('end', function () {
+            console.log(str);
+            });
+            }
+            //console.log('hello js'))
+            http.request(options, callback).end();
           res.status(200).send({
             message: "OTP Sent to Your Mobile Number",
-            data: data.mobile,
+            data: userData[0].mobile,
             success:1
           });
 
@@ -64,9 +88,11 @@ exports.create = (req, res) => {
                   });
             }else{
                 var otp= Math.floor(Math.random() * (999999 - 100000) + 100000);
+              
                 const newUser = {
                     name:req.body.name,
                     referral_id:refer_id,
+                    your_id:req.body.mobile,
                     mobile:req.body.mobile,
                     password: hash,
                     otp:otp
@@ -74,41 +100,66 @@ exports.create = (req, res) => {
                   User.create(newUser)
                   .then(async data => {
 
-                    var message = 'Dear Customer! Your BIGSPG Login OTP is '+otp+'.';
+                   // var message = 'Dear Customer! Your BIGSPG Login OTP is '+otp+'.';
 
-                    var url = 'http://server2.smsnot.com/v2/sendSMS?username=spingame&message='+message+'&sendername=EBSPIG&smstype=TRANS&numbers='+req.body.mobile+'&apikey=0d387439-f834-4e0e-98eb-cb9e4dd5a10b&peid=1201163102281800017&templateid=1207163153499355887';
+                    var message = urlencode('Dear Customer! Your BIGSPG Login OTP is '+otp+'.');
+                    //  var msg=urlencode('hello js');
+                      var number=userData[0].mobile;
+                      var apikey='NjMzMzUyMzUzMTMxNjM0MzQzNzQ2ZDRlNDc0MjU0NDg=';
+                   
+                      var sender='EBSPIG';
+                      var data='apikey='+apikey+'&sender='+sender+'&numbers='+number+'&message='+message
+                      var options = {
+                      host: 'api.textlocal.in',
+                      path: '/send?'+data
+                      };
+                      callback = function(response) {
+                      var str = '';
+                      //another chunk of data has been recieved, so append it to `str`
+                      response.on('data', function (chunk) {
+                      str += chunk;
+                      });
+                      //the whole response has been recieved, so we just print it out here
+                      response.on('end', function () {
+                      console.log(str);
+                      });
+                      }
+                      //console.log('hello js'))
+                      http.request(options, callback).end();
+
+                    // var url = 'http://server2.smsnot.com/v2/sendSMS?username=spingame&message='+message+'&sendername=EBSPIG&smstype=TRANS&numbers='+req.body.mobile+'&apikey=0d387439-f834-4e0e-98eb-cb9e4dd5a10b&peid=1201163102281800017&templateid=1207163153499355887';
        
                    await http.get(url);
-                    var referBonusSetting = await Setting.findOne({where:{slug:'refer_bonus'}});
-                    var registerBonusSetting = await Setting.findOne({where:{slug:'refer_register_bonus'}});
-                    var welcomeBonusSetting = await Setting.findOne({where:{slug:'registration_bonus'}});
-             //       console.log(setting);
+            //         var referBonusSetting = await Setting.findOne({where:{slug:'refer_bonus'}});
+            //         var registerBonusSetting = await Setting.findOne({where:{slug:'refer_register_bonus'}});
+            //         var welcomeBonusSetting = await Setting.findOne({where:{slug:'registration_bonus'}});
+            //  //       console.log(setting);
 
-                    if(refer_id){
+            //         if(refer_id){
 
-                      var referUser= await User.findByPk(refer_id);
+            //           var referUser= await User.findByPk(refer_id);
                       
-                      var refWallet = referUser.wallet+referBonusSetting.option;
-                      var refBalance= refWallet+referUser.earnings;
-                        await User.update({wallet:refWallet},{where:{id:refer_id}});
-                        await User.update({wallet:registerBonusSetting.option},{where:{id:data.id}});
-                        await walletHistory.create({
-                          user_id:data.id,amount:registerBonusSetting.option,balance:registerBonusSetting.option,credit_debit:'credit',type:'bonus',comment:'Registration Bonus'
-                        });
-                        await walletHistory.create({
-                          user_id:refer_id,amount:referBonusSetting.option,balance:refBalance,credit_debit:'credit',type:'bonus',comment:'Referral Registration Bonus'
-                        });
+            //           var refWallet = referUser.wallet+referBonusSetting.option;
+            //           var refBalance= refWallet+referUser.earnings;
+            //             await User.update({wallet:refWallet},{where:{id:refer_id}});
+            //             await User.update({wallet:registerBonusSetting.option},{where:{id:data.id}});
+            //             await walletHistory.create({
+            //               user_id:data.id,amount:registerBonusSetting.option,balance:registerBonusSetting.option,credit_debit:'credit',type:'bonus',comment:'Registration Bonus'
+            //             });
+            //             await walletHistory.create({
+            //               user_id:refer_id,amount:referBonusSetting.option,balance:refBalance,credit_debit:'credit',type:'bonus',comment:'Referral Registration Bonus'
+            //             });
 
-                    }
-                    var welcomeBonus= welcomeBonusSetting.option;
-                    var newUser= await User.findByPk(data.id);
-                    var userWallet = newUser.wallet+welcomeBonus;
-                    var userBalance= userWallet+newUser.earnings;
+            //         }
+            //         var welcomeBonus= welcomeBonusSetting.option;
+            //         var newUser= await User.findByPk(data.id);
+            //         var userWallet = newUser.wallet+welcomeBonus;
+            //         var userBalance= userWallet+newUser.earnings;
 
-                   await User.update({wallet:userWallet},{where:{id:data.id}});
-                    await walletHistory.create({
-                      user_id:data.id,amount:welcomeBonus,balance:userBalance,credit_debit:'credit',type:'bonus',comment:'Welcome Bonus'
-                    });
+            //        await User.update({wallet:userWallet},{where:{id:data.id}});
+            //         await walletHistory.create({
+            //           user_id:data.id,amount:welcomeBonus,balance:userBalance,credit_debit:'credit',type:'bonus',comment:'Welcome Bonus'
+            //         });
 
                     res.status(200).send({
                         message: "OTP Sent to Your Mobile Number",
@@ -180,13 +231,50 @@ exports.verifyMobile = async(req, res) => {
     console.log(user);
     User.findByPk(user.id)
     .then(data => {
-      if(data.otp== otp){
+      if(data.otp== otp && data.mobile_verified=="no"){
 
         let values= {
             mobile_verified:"yes"
         };
 
-        User.update(values,{where: {id:user.id}}).then(num=>{
+        User.update(values,{where: {id:user.id}}).then(async num=>{
+
+
+
+          var referBonusSetting = await Setting.findOne({where:{slug:'refer_bonus'}});
+          var registerBonusSetting = await Setting.findOne({where:{slug:'refer_register_bonus'}});
+          var welcomeBonusSetting = await Setting.findOne({where:{slug:'registration_bonus'}});
+   //       console.log(setting);
+
+
+          var welcomeBonus= welcomeBonusSetting.option;
+          var newUser= await User.findByPk(data.id);
+          var userWallet = newUser.wallet+welcomeBonus;
+          var userBalance= userWallet+newUser.earnings;
+
+         await User.update({wallet:userWallet},{where:{id:data.id}});
+          await walletHistory.create({
+            user_id:data.id,amount:welcomeBonus,balance:userBalance,credit_debit:'credit',type:'bonus',comment:'Welcome Bonus'
+          });
+          console.log("ref user");
+          console.log(data.referral_id);
+          if(data.referral_id){
+            var newUser= await User.findByPk(data.id);
+            var referUser= await User.findByPk(data.referral_id);
+            var userWallet = newUser.wallet +registerBonusSetting.option;
+            var refWallet = referUser.wallet+referBonusSetting.option;
+            var refBalance= refWallet+referUser.earnings;
+         
+              await User.update({wallet:refWallet},{where:{id:referUser.id}});
+              await User.update({wallet:userWallet},{where:{id:data.id}});
+              await walletHistory.create({
+                user_id:data.id,amount:registerBonusSetting.option,balance:registerBonusSetting.option,credit_debit:'credit',type:'bonus',comment:'Registration Bonus'
+              });
+              await walletHistory.create({
+                user_id:referUser.id,amount:referBonusSetting.option,balance:refBalance,credit_debit:'credit',type:'bonus',comment:'Referral Registration Bonus'
+              });
+
+          }
 
             res.status(200).send({
                 message: "Mobile Verified Successfully",

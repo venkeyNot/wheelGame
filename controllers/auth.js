@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt= require('bcrypt');
 require('dotenv').config();
 var http = require("http");
+var urlencode = require('urlencode');
 exports.login = async(req, res) => {
 
     var condition = {mobile:req.body.mobile};
@@ -128,10 +129,33 @@ exports.resetPassword = (req, res) => {
                 User.update(updateUser,{where:{id:userData.id}})
                 .then(async data => {
 
-                  var message = 'Dear Customer! Your BIGSPG Login OTP is '+otp+'.';
-
-                  var url = 'http://server2.smsnot.com/v2/sendSMS?username=spingame&message='+message+'&sendername=EBSPIG&smstype=TRANS&numbers='+req.body.mobile+'&apikey=0d387439-f834-4e0e-98eb-cb9e4dd5a10b&peid=1201163102281800017&templateid=1207163153499355887';
-                  await http.get(url);
+        
+                  var message = urlencode('Dear Customer! Your BIGSPG Login OTP is '+otp+'.');
+                  //  var msg=urlencode('hello js');
+                    var number=userData.mobile;
+                    var apikey='NjMzMzUyMzUzMTMxNjM0MzQzNzQ2ZDRlNDc0MjU0NDg=';
+                 
+                    var sender='EBSPIG';
+                    var data='apikey='+apikey+'&sender='+sender+'&numbers='+number+'&message='+message
+                    var options = {
+                    host: 'api.textlocal.in',
+                    path: '/send?'+data
+                    };
+                    callback = function(response) {
+                    var str = '';
+                    //another chunk of data has been recieved, so append it to `str`
+                    response.on('data', function (chunk) {
+                    str += chunk;
+                    });
+                    //the whole response has been recieved, so we just print it out here
+                    response.on('end', function () {
+                    console.log(str);
+                    });
+                    }
+                    //console.log('hello js'))
+                    http.request(options, callback).end();
+                  // var url = 'http://server2.smsnot.com/v2/sendSMS?username=spingame&message='+message+'&sendername=EBSPIG&smstype=TRANS&numbers='+req.body.mobile+'&apikey=0d387439-f834-4e0e-98eb-cb9e4dd5a10b&peid=1201163102281800017&templateid=1207163153499355887';
+                //  await http.get(url);
 
                   res.status(200).send({
                       message: "OTP Sent to Your Mobile Number",
