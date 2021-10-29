@@ -12,7 +12,16 @@ const Op = db.Sequelize.Op;
 const moment = require('moment');
 const TODAY_START = new Date().setHours(0, 0, 0, 0);
 const NOW = new Date();
-const pusher =require('../config/pusherConnect');
+const Pusher = require("pusher");
+
+const pusher = new Pusher({
+   appId: "1263492",
+   key: "ee1c78c99a222d043d29",
+   secret: "a51ea7cbe572d7946ac0",
+   cluster: "ap2",
+   useTLS: true
+ });
+
 exports.games= async (req,res) => {
 
 
@@ -62,7 +71,10 @@ exports.games= async (req,res) => {
       
 
     }
+    if(siteSettings.gameServerStatus=='stop'){
 
+      clearInterval(gameServerTime);
+    }
 
 
 
@@ -90,6 +102,21 @@ exports.games= async (req,res) => {
 
                 gamePlay.findByPk(gameId).then(async againUpdatedGamePlay=>{
                    console.log(againUpdatedGamePlay.time_left);
+                  //Virtual Coin bot Players
+                   if(againUpdatedGamePlay.time_left>1){
+
+                     var botColors= ['white','blue','red','green','black','yellow'];
+                     var botAmount= ['1','10','100',];
+                     var colorRandom= Math.floor(Math.random()*botColors.length);
+                     var amountRandom= Math.floor(Math.random()*botAmount.length);
+                     var resultColor=botColors[colorRandom];
+                     var resultAmount=botAmount[amountRandom];
+                    pusher.trigger("game."+gameId+"", "play", {
+                      option: resultAmount,
+                      color:resultColor,
+                      user_id:0
+                    });
+                   }
                   if(againUpdatedGamePlay.time_left<1){
 
                     gamePlay.update({result_time:20,status:'result'},{where:{id:fetchPlay.id}});
@@ -99,7 +126,7 @@ exports.games= async (req,res) => {
                     var oneGameColorPlacedAmount=[];
                     oneGameColorAmount[0] =0;
                     oneGameColorPlacedAmount[0] =0;
-                   var colors =await Color.findAll();
+                    var colors =await Color.findAll();
                     for(let color of colors){
                       oneGameColorAmount[color.id]=0;
                       oneGameColorPlacedAmount[color.id]=0;
@@ -186,7 +213,7 @@ exports.games= async (req,res) => {
                         user_id:winner.id,game_id:fetchPlay.id,amount:totalWinAmount,balance:newBalance,credit_debit:'credit',type:'game',wallet_type:'earnings'
                       });
                       await walletHistory.create({
-                        user_id:winner.id,game_id:1,amount:gulkanPoints,balance:(newBalance+gulkanPoints),credit_debit:'credit',type:'bonus',wallet_type:'gulkan_points'
+                        user_id:winner.id,game_id:fetchPlay.id,amount:gulkanPoints,balance:(newBalance+gulkanPoints),credit_debit:'credit',type:'bonus',wallet_type:'gulkan_points'
                       });
                      //oneGameColorAmount.push(optionAmount*nTimes)
                     }
@@ -203,6 +230,7 @@ exports.games= async (req,res) => {
                                     var date= moment().format('YYYY-MM-DD');
                                     var winGameColorAmount= oneGameColorAmount[result];
                                     var adminProfit= totalPlacedAmount-winGameColorAmount;
+                                    var totalAdminProfit = siteSettings.admin_profit + adminProfit;
                                     // console.log("placedamount");
                                     // console.log(totalPlacedAmount);
 
@@ -211,6 +239,10 @@ exports.games= async (req,res) => {
 
                                     console.log("Admin Profit");
                                     console.log(adminProfit);
+
+
+                                    console.log("Today Earnings");
+                                    console.log(todayEarnings.count);
 
                                   if(todayEarnings.count<1){
 
@@ -240,7 +272,8 @@ exports.games= async (req,res) => {
                       if(resultCheck.result_time<1){
                         console.log("result_time");
                         console.log(resultCheck.result_time);
-                        await gamePlay.update({status:'closed',admin_profit:0,comment:'result'+result+'random'+randomColor+''},{where:{id:gameId}});
+                        await gamePlay.update({status:'closed',admin_profit:adminProfit,comment:'result'+result+'random'+randomColor+''},{where:{id:gameId}});
+                        await siteSettings.update({admin_profit:totalAdminProfit},{where:{id:1}})
                         delete gameId,resultGamePlay,time,clearResultTime;
                         clearInterval(reduceResultTime);
              

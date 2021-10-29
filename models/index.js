@@ -44,4 +44,5 @@ db.depositRequest = require("./depositrequest.js")(sequelize, Sequelize);
 db.siteSetting = require("./sitesetting.js")(sequelize, Sequelize);
 db.userDailyBonus = require("./userdailybonus.js")(sequelize, Sequelize);
 db.adminEarning = require("./adminearning.js")(sequelize, Sequelize);
+db.notification = require("./notification.js")(sequelize, Sequelize);
 module.exports = db;

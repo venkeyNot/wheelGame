@@ -28,7 +28,8 @@ router.get('/profile',userAuth, profileController.profile);
 router.post('/profile/bank',userAuth, profileController.updateBank);
 router.post('/profile/update',userAuth, profileController.updateProfile);
 router.post('/profile/changePassword',userAuth, profileController.changePassword);
-
+router.post('/profile/updateFirebaseToken',userAuth, profileController.updateFirebaseToken);
+router.get('/profile/notifications',userAuth, profileController.notifications);
 
 router.post('/wallet/history',userAuth, walletController.history);
 // router.post('/wallet/recharge',userAuth, walletController.recharge);

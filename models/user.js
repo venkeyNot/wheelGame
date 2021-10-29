@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     password: DataTypes.STRING,
     otp: DataTypes.STRING,
     token: DataTypes.TEXT,
+    firebaseToken: DataTypes.TEXT,
     mobile_verified: DataTypes.ENUM('yes','no'),
     wallet: DataTypes.DOUBLE,
     earnings: DataTypes.DOUBLE,

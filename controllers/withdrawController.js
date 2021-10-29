@@ -60,7 +60,7 @@ exports.request= (req,res,next) => {
       console.log(todayWithdrawls);
       if(todayWithdrawls<setting.option){
 
-        var fee=0;
+        var fee=2;
         if(todayWithdrawls>=freeWithdrwal.option){
 
           var fee= (amount/100)*withdrwalFee.option;
@@ -91,7 +91,7 @@ exports.request= (req,res,next) => {
 
               message:"Amount "+amount+" Withdraw requested successfully",
               success:1,
-              data:moment()
+             
             });
           }else{
 

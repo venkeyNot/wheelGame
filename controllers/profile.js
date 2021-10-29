@@ -1,6 +1,7 @@
 const db = require("../models");
 process.env.TZ = "Asia/Calcutta";
 const User = db.user;
+const Notification = db.notification;
 const Op = db.Sequelize.Op;
 const jwt = require('jsonwebtoken');
 const bcrypt= require('bcrypt');
@@ -24,6 +25,21 @@ exports.profile=(req,res,next)=>{
 
 };
 
+exports.notifications=(req,res,next)=>{
+
+  Notification.findAll({where:{user_id:req.userData.userId}}).then(notifications=>{
+
+   res.status(200).json({
+
+    data:notifications,
+    // amount:amount,
+
+   });
+ })
+
+
+};
+
 
 
 exports.updateProfile= (req,res,next)=>{
@@ -42,7 +58,21 @@ exports.updateProfile= (req,res,next)=>{
 
 };
 
+exports.updateFirebaseToken= (req,res,next)=>{
 
+  var user = User.findByPk(req.userData.userId).then(async user=>{
+
+    User.update({firebaseToken:req.body.firebaseToken},{where:{id:user.id}});
+    res.status(200).json({
+
+      message:'Token Updated Successfully',
+      user:user,
+      success:1
+    });
+  })
+
+
+};
 exports.updateBank=(req,res,next)=>{
 
    User.findByPk(req.userData.userId).then(async user=>{

@@ -216,18 +216,19 @@ exports.play = async (req, res, next) => {
         var useEarning = player.earnings+(newWallet);
         var debitWallet= 0;
         var debitEarnings= useEarning;
+        var balance= balance-amount;
         await User.update({wallet:debitWallet,earnings:debitEarnings},{where:{id:player.id}});
         await walletHistory.create({
-          user_id:player.id,game_id:1,amount:-amount,balance:debitWallet,credit_debit:'debit',type:'game',wallet_type:'earnings'
+          user_id:player.id,game_id:1,amount:-amount,balance:balance,credit_debit:'debit',type:'game',wallet_type:'earnings'
         });
 
       }else{
 
         var debitWallet= player.wallet-amount;
-
+        var  balance =  balance-amount;
         await User.update({wallet:debitWallet},{where:{id:player.id}});
         await walletHistory.create({
-          user_id:player.id,game_id:1,amount:-amount,balance:debitWallet,credit_debit:'debit',type:'game',wallet_type:'wallet'
+          user_id:player.id,game_id:1,amount:-amount,balance:balance,credit_debit:'debit',type:'game',wallet_type:'wallet'
         });
 
       }

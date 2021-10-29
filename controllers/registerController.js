@@ -7,6 +7,7 @@ const Op = db.Sequelize.Op;
 const bcrypt= require('bcrypt');
 var http = require('http');
 var urlencode = require('urlencode');
+const moment = require('moment');
 // Create and Save a new Tutorial
 exports.create = (req, res) => {
     if (!req.body.mobile || !req.body.password) {
@@ -75,6 +76,9 @@ exports.create = (req, res) => {
                 res.status(200).send({
                     message: "Invalid Referral Id"
                   });
+
+                  return true;
+
 
             }
           }
@@ -297,4 +301,12 @@ exports.verifyMobile = async(req, res) => {
         message: "Error retrieving Tutorial with id="
       });
     });
+};
+exports.index = (req, res) => {
+  var day = moment().weekday();
+    res.status(200).send({
+      message:
+       "Welcome to Game"+day
+    });
+
 };

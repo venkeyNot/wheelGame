@@ -14,7 +14,7 @@ const Setting = db.setting;
 exports.createDailyBonus= async(req,res,next) => {
 
 
-  for(i=1;i<=7;i++){
+  for(i=0;i<=7;i++){
 
     var daily = NOW.setDate(NOW.getDate() +1);
     var user_id=3;

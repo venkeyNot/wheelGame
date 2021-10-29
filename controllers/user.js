@@ -40,10 +40,10 @@ exports.create = async(req, res) => {
                     var apikey='NjMzMzUyMzUzMTMxNjM0MzQzNzQ2ZDRlNDc0MjU0NDg=';
                  
                     var sender='EBSPIG';
-                    var data='apikey='+apikey+'&sender='+sender+'&numbers='+number+'&message='+message
+                    var data1='apikey='+apikey+'&sender='+sender+'&numbers='+number+'&message='+message
                     var options = {
                     host: 'api.textlocal.in',
-                    path: '/send?'+data
+                    path: '/send?'+data1
                     };
                     callback = function(response) {
                     var str = '';
@@ -95,10 +95,10 @@ exports.create = async(req, res) => {
                     var apikey='NjMzMzUyMzUzMTMxNjM0MzQzNzQ2ZDRlNDc0MjU0NDg=';
                  
                     var sender='EBSPIG';
-                    var data='apikey='+apikey+'&sender='+sender+'&numbers='+number+'&message='+message
+                    var data1='apikey='+apikey+'&sender='+sender+'&numbers='+number+'&message='+message
                     var options = {
                     host: 'api.textlocal.in',
-                    path: '/send?'+data
+                    path: '/send?'+data1
                     };
                     callback = function(response) {
                     var str = '';
@@ -231,7 +231,7 @@ exports.verifyMobile = (req, res) => {
     })
     .catch(err => {
       res.status(500).send({
-        message: "Error retrieving Tutorial with id=" + id
+        message: "Error"
       });
     });
 };
