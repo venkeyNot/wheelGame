@@ -7,7 +7,8 @@ const walletHistory=db.walletHistory;
 const siteSetting = db.siteSetting;
 const Op = db.Sequelize.Op;
 const Pusher = require("pusher");
-
+const moment = require('moment');
+const today = moment().format('YYYY-MM-DD');
 const pusher = new Pusher({
    appId: "1263492",
    key: "ee1c78c99a222d043d29",
@@ -22,7 +23,7 @@ exports.colors= (req,res) => {
 
 
   try{
-    Color.findAll().then(colors=>{
+    Color.findAll({where:{status:'show'}}).then(colors=>{
 
     
 
@@ -47,13 +48,13 @@ exports.fetchGame= async (req,res) => {
 
   console.log(siteSettings);
   try{
-    gamePlays.findOne({
+  await  gamePlays.findOne({
         order: [ [ 'createdAt', 'DESC' ]],
     }).then(async latestGame=>{
 
     // if(latestGame.status=='started'){
     var recentColors= await gamePlays.findAll({attributes:['result'],limit:15,order:[['id','DESC']],where:{result:{[Op.not]:null}}});
-    var allColors= await Color.findAll();
+    var allColors= await Color.findAll({where:{status:'show'}});
     var colorTotal={};
     var myColors ={};
     var gamePlayId= latestGame.id;
@@ -161,7 +162,7 @@ exports.fetchGame= async (req,res) => {
      colors[i] = colorName.slug;
      i++;
     }
-      
+
 
         res.status(200).json({
             success:1,
@@ -185,7 +186,7 @@ exports.fetchGame= async (req,res) => {
     
   }catch (err){
 
-    next(err);
+  //  next(err);
   }
 
 };
@@ -241,16 +242,26 @@ exports.play = async (req, res, next) => {
         game_play_id:req.body.game_play_id,
         option:req.body.option,
         ntimes:color.ntimes,
-        amount:req.body.amount
+        amount:req.body.amount,
+        date:today
       };
       gamePosition.create(newPlay)
-      .then(data => {
+      .then(async data => {
+        var played = await gamePosition.count({where:{user_id:userId,game_play_id:req.body.game_play_id}});
+        console.log('Played');
+        console.log(played);
+        if(played<=1){
 
+          var newPlayer =await User.findByPk(userId);
+
+          await User.update({played_games:newPlayer.played_games+1},{where:{id:userId}});
+        }
         pusher.trigger("game."+req.body.game_play_id+"", "play", {
           option: req.body.amount,
           color:color.slug,
           user_id:userId
         });
+
         res.status(200).send({
             message: "Game Placed Successfully",
             data: data,
@@ -274,7 +285,7 @@ exports.result= async(req,res)=>{
   
   var oneGameColorAmount =[];
    oneGameColorAmount[0] =0;
-  var colors =await Color.findAll();
+  var colors =await Color.findAll({where:{status:'show'}});
 //   colors.forEach(async(color)=>{
 //     var allGamePositions= await gamePosition.findAll({where:{game_play_id:1,option:color.id}});
 //     allGamePositions.forEach((gamePosition)=>{

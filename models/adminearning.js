@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
   adminEarning.init({
     date: DataTypes.DATE,
     day: DataTypes.BIGINT,
+    business: DataTypes.BIGINT,
     amount: DataTypes.BIGINT,
     comment: DataTypes.TEXT
   }, {

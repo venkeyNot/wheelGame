@@ -47,7 +47,7 @@ exports.games= async (req,res) => {
 }
 
 
-  // var gameServerTime = setInterval(game,60000);
+   var gameServerTime = setInterval(game,60000);
    var siteSettings= await siteSetting.findByPk(1);
 
      async function game(){
@@ -84,7 +84,7 @@ exports.games= async (req,res) => {
       await gamePlay.create(data).then(gameData=>{
        
    
-      var gameId=gameData.id;
+      gameId=gameData.id;
    
 
       var reduceTime= setInterval(reduce,1000);
@@ -100,25 +100,25 @@ exports.games= async (req,res) => {
                var againUpdatedGamePlay=await gamePlay.findByPk(fetchPlay.id);
                    console.log(againUpdatedGamePlay.time_left);
                   //Virtual Coin bot Players
-                  try{
-                    if(againUpdatedGamePlay.time_left>1){
+                //   try{
+                //    if(againUpdatedGamePlay.time_left>1){
 
-                     var botColors= ['white','blue','red'];
-                     var botAmount= ['1','10','100','1','10','100','1','10','100','1','10','100','1','10','100','1','10','100','1','10','100','1000','5000'];
-                     var colorRandom= Math.floor(Math.random()*botColors.length);
-                     var amountRandom= Math.floor(Math.random()*botAmount.length);
-                     var resultColor=botColors[colorRandom];
-                     var resultAmount=botAmount[amountRandom];
-                    pusher.trigger("game."+againUpdatedGamePlay.id+"", "play", {
-                      option: resultAmount,
-                      color:resultColor,
-                      user_id:0
-                    });
-                    } 
-                  }catch (err) {
-                    // handle the error safely
-                    console.log(err)
-                }
+                //      var botColors= ['white','blue','red'];
+                //      var botAmount= ['1','10','100','1','10','100','1','10','100','1','10','100','1','10','100','1','10','100','1','10','100','1000','5000'];
+                //      var colorRandom= Math.floor(Math.random()*botColors.length);
+                //      var amountRandom= Math.floor(Math.random()*botAmount.length);
+                //      var resultColor=botColors[colorRandom];
+                //      var resultAmount=botAmount[amountRandom];
+                //     pusher.trigger("game."+gameId+"", "play", {
+                //       option: resultAmount,
+                //       color:resultColor,
+                //       user_id:0
+                //     });
+                //    }
+                //   }catch (err) {
+                //     // handle the error safely
+                //     console.log(err)
+                // }
                   if(againUpdatedGamePlay.time_left<1){
 
                     gamePlay.update({result_time:20,status:'result'},{where:{id:fetchPlay.id}});
@@ -175,67 +175,26 @@ exports.games= async (req,res) => {
                     }
                //   }
                     var selectedColors = [];
-                    var selectedMinColors = [];
                     
-                    if(totalPlacedAmount>0){
-                    
-                        for(i=1;i<=6;i++){
+                    for(i=1;i<=6;i++){
 
-                          if(i==1 || i==2 || i==3){
+                      if(i==1 || i==2 || i==3){
 
-                          if(totalPlacedAmount>oneGameColorAmount[i]){
-                            //selectedColors[i]= oneGameColorAmount[i];
-                            selectedColors.push({
-                              color:i,
-                              value:oneGameColorAmount[i]
-                            })
+                      if(totalPlacedAmount>oneGameColorAmount[i]){
+                        selectedColors.push(i);
+                      }
 
-                          }else{
-
-                            selectedMinColors.push(oneGameColorAmount[i]);
-                            console.log("selectedMinColors");
-                            console.log(selectedMinColors);
-                          }
-
-                        }
-
-                        }
-
-                        if(selectedColors.length>0){
-
-                          var preResult = Math.min.apply(Math, selectedColors.map(function(o) { return o.value; }));
-                          var arrays =  selectedColors.filter((elm) => elm.value == preResult);
-                        //  var preResult= selectedColors.reduce((iMax, x, i, arr) => x < arr[iMax] ? i : iMax, 0);
-                         console.log("selectedColors",arrays);
-                         console.log("preResult",preResult);
-                         console.log("preResult");
-                          var result = arrays[0].color;
-                        }else{
-
-                          var preResult= selectedMinColors.reduce((iMax, x, i, arr) => x < arr[iMax] ? i : iMax, 0);
-                          console.log("preResult");
-                          console.log(preResult);
-                          var result=preResult+1;
-                        }
-                  }
-
+                    }
+                    }
                  
                     // for(colorAmount of oneGameColorAmount){
 
                     
                     // }
 
-                    if(selectedColors.length==0 && totalPlacedAmount==0){
+                    if(selectedColors.length==0){
 
                       selectedColors=[1,2,3];
-
-                      var randomColor= randomResult(0, selectedColors.length-1);
-                      var result = selectedColors[randomColor];
-
-                      function randomResult(min, max) {
-                        return Math.floor(Math.random() * (max - min + 1)) + min;
-
-                      }
 
                     }
                     console.log("selectedColors");
@@ -246,17 +205,19 @@ exports.games= async (req,res) => {
                     // console.log('rand');
                     // console.log(rand);
                     // var randomColor= Math.floor(Math.random()*rand);
-                  
+                    var randomColor= randomResult(0, selectedColors.length-1);
+                    var result = selectedColors[randomColor];
                     //  var result =selectedColors.indexOf(selectedColors[randomColor]);
                      
                    //  var result = randomResult(1, selectedColors.length);
-                 
+                      function randomResult(min, max) {
+                        return Math.floor(Math.random() * (max - min + 1)) + min;
+
+                      }
                     //     return (num === resultLarge) ? randomResult(min, max) : num;
                     // }
-                    console.log("selectedColors");
-                    console.log(selectedColors);
-                    console.log("selectedMinColors");
-                    console.log(selectedMinColors);
+                    console.log("randomColor");
+                    console.log(randomColor);
                     console.log("result");
                      console.log(result);
                    // console.log(resultLarge);
@@ -287,10 +248,10 @@ exports.games= async (req,res) => {
                       var checkPosition= await gamePosition.findByPk(gameWinner.id);
                       if(checkPosition.status!='cleared'){
                       await walletHistory.create({
-                        user_id:winner.id,user_name:winner.name,game_id:fetchPlay.id,amount:totalWinAmount,balance:newBalance,credit_debit:'credit',type:'game',wallet_type:'earnings',comment:''
+                        user_id:winner.id,game_id:fetchPlay.id,amount:totalWinAmount,balance:newBalance,credit_debit:'credit',type:'game',wallet_type:'earnings',comment:result
                       });
                       await walletHistory.create({
-                        user_id:winner.id,user_name:winner.name,game_id:fetchPlay.id,amount:gulkanPoints,balance:(newBalance+gulkanPoints),credit_debit:'credit',type:'bonus',wallet_type:'gulkan_points',comment:''
+                        user_id:winner.id,game_id:fetchPlay.id,amount:gulkanPoints,balance:(newBalance+gulkanPoints),credit_debit:'credit',type:'bonus',wallet_type:'gulkan_points',comment:result
                       });
                       await gamePosition.update({
                         status:'cleared'
@@ -363,9 +324,9 @@ exports.games= async (req,res) => {
                           clearInterval(gameServerTime);
                         }
 
-                     
+
                       }
-                      
+
                     }
                     clearInterval(reduceTime);
                     delete gameId,time,playData;
@@ -378,8 +339,6 @@ exports.games= async (req,res) => {
         }
       });
     }
-
-    var gameServerTime = setInterval(game,60000);
 
     
     res.status(200).json({

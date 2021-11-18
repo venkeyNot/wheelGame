@@ -5,7 +5,7 @@
     "database": "Wheel",
     "host": "127.0.0.1",
     "dialect": "mysql",
-    "timezone": "Asia/Calcutta"
+    "timezone": "+05:30"
   },
   "test": {
     "username": "root",
@@ -13,7 +13,7 @@
     "database": "Wheel",
     "host": "127.0.0.1",
     "dialect": "mysql",
-    "timezone": "Asia/Calcutta"
+    "timezone": "+05:30"
 
   },
   "production": {
@@ -22,7 +22,7 @@
     "database": "Wheel",
     "host": "127.0.0.1",
     "dialect": "mysql",
-    "timezone": "Asia/Calcutta"
+    "timezone": "+05:30"
   }
   
 

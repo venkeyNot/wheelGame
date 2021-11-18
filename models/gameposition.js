@@ -20,7 +20,9 @@ module.exports = (sequelize, DataTypes) => {
     option: DataTypes.BIGINT,
     ntimes: DataTypes.BIGINT,
     amount: DataTypes.BIGINT,
-    comment: DataTypes.TEXT
+    comment: DataTypes.TEXT,
+    status:DataTypes.ENUM('pending','cleared'),
+    date: DataTypes.DATE,
   }, {
     sequelize,
     modelName: 'gamePosition',

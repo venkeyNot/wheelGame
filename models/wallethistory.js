@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   };
   walletHistory.init({
     user_id: DataTypes.BIGINT,
+    user_name: DataTypes.TEXT,
     game_id: DataTypes.BIGINT,
     amount: DataTypes.DOUBLE,
     balance: DataTypes.DOUBLE,

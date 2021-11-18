@@ -34,6 +34,8 @@ module.exports = (sequelize, DataTypes) => {
     UPI: DataTypes.STRING,
     your_id: DataTypes.STRING,
     referral_id: DataTypes.STRING,
+    played_games: DataTypes.INTEGER,
+    won_games: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'user',

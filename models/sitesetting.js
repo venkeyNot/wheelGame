@@ -25,6 +25,8 @@ module.exports = (sequelize, DataTypes) => {
     min_android_version:DataTypes.TEXT,
     admin_profit:DataTypes.DOUBLE,
     gameServerStatus: DataTypes.ENUM('start','stop'),
+    status: DataTypes.ENUM('live','stop'),
+    status_text:DataTypes.TEXT
   }, {
     sequelize,
     modelName: 'site_settings',

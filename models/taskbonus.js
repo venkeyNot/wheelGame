@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class notification extends Model {
+  class taskBonus extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -13,14 +13,16 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   };
-  notification.init({
-    user_id: DataTypes.INTEGER,
-    status: DataTypes.ENUM('read','unread'),
-    message: DataTypes.TEXT,
-    comment: DataTypes.TEXT,
+  taskBonus.init({
+    user_id: DataTypes.BIGINT,
+    total_plays: DataTypes.BIGINT,
+    bonus: DataTypes.BIGINT,
+    status: DataTypes.ENUM('pending','expired','claim','claimed'),
+    comment:DataTypes.STRING,
+    claimed_date:DataTypes.DATE,
   }, {
     sequelize,
-    modelName: 'notifications',
+    modelName: 'taskBonus',
   });
-  return notification;
+  return taskBonus;
 };

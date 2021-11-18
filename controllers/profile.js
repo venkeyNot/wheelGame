@@ -40,7 +40,20 @@ exports.notifications=(req,res,next)=>{
 
 };
 
+exports.readNotifications=(req,res,next)=>{
 
+  Notification.update({status:'read'},{where:{user_id:req.userData.userId}}).then(notifications=>{
+
+   res.status(200).json({
+
+    data:notifications,
+    // amount:amount,
+
+   });
+ })
+
+
+};
 
 exports.updateProfile= (req,res,next)=>{
 

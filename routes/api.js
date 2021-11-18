@@ -30,6 +30,7 @@ router.post('/profile/update',userAuth, profileController.updateProfile);
 router.post('/profile/changePassword',userAuth, profileController.changePassword);
 router.post('/profile/updateFirebaseToken',userAuth, profileController.updateFirebaseToken);
 router.get('/profile/notifications',userAuth, profileController.notifications);
+router.get('/profile/readNotifications',userAuth, profileController.readNotifications);
 
 router.post('/wallet/history',userAuth, walletController.history);
 // router.post('/wallet/recharge',userAuth, walletController.recharge);
@@ -51,8 +52,10 @@ router.get('/withdraws',userAuth, withdrawController.withdrawRequests);
 router.post('/withdraw/request',userAuth, withdrawController.request);
 router.post('/deposit/request',userAuth, walletController.depositRequest);
 router.get('/setting', settingController.settings);
+router.get('/winners', settingController.winners);
 router.get('/siteSetting', settingController.siteSettings);
-router.get('/createDailyBonus', bonusController.createDailyBonus);
+router.get('/getTaskBonus',[userAuth], bonusController.getTaskBonus);
+router.post('/claimTaskBonus',userAuth, bonusController.claimTaskBonus);
 router.post('/claimBonus',userAuth, bonusController.claimBonus);
 router.get('/dailyBonus', userAuth, bonusController.dailyBonus);
 router.post('/upload/profile_pic', upload.single('profile_pic'), function (req, res, next) {
